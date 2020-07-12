@@ -6,6 +6,11 @@ function getCountry(items, country) {
   return items.filter((i) => i.u === country)[0];
 }
 
+function resolve(path, obj = "", separator = ".") {
+  var properties = Array.isArray(path) ? path : path.split(separator);
+  return properties.reduce((prev, curr) => prev && prev[curr], obj);
+}
+
 function getColumn(items, column) {
   if (!items) return [];
   if (!column) return [];
@@ -48,6 +53,8 @@ function renameCountryProperties(p) {
 function itemR(item) {
   return `
     <a class="push-right">
+    <i src="flags/blank.gif" style=" border: 1px solid rgb(95, 95, 95); vertical-align: text-bottom;"
+							class="flag flag-${item.u.toLowerCase()}"></i>
         ${item.c}
     </a>
 `;

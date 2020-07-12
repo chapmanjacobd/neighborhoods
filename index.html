@@ -41,8 +41,12 @@
 
 			<header class="bar bar-nav">
 				<a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
-				<h1 class="title" x-text="$store.s.country?.c + ' (' + $store.s.country?.u + ')'"></h1>
+				<h1 class="title"
+					x-text="resolve('c',  getCountry(items, $store.s.country)) + ' (' + resolve('u',  getCountry(items, $store.s.country)) + ')'">
+				</h1>
 			</header>
+
+
 
 			<div class="content">
 
@@ -50,16 +54,16 @@
 				<div class="content-padded">
 
 					<div style="display: flex; justify-content: space-between; align-items: baseline;">
-						<h1 x-text="$store.s.country?.c"></h1>
+						<h1 x-text="resolve('c',  getCountry(items, $store.s.country))"></h1>
 						<i src="flags/blank.gif" style=" border: 1px solid rgb(95, 95, 95);"
-							:class="'flag flag-' + $store.s.country?.u?.toLowerCase()"></i>
+							:class="'flag flag-' + resolve('u',  getCountry(items, $store.s.country)).toLowerCase()"></i>
 					</div>
 
 					<ul class="table-view">
 						<li class="table-view-cell navigate-right"><a href="/cities.html">
 								<strong>View cities</strong></a></li>
 
-						<template x-for="c of countryDisplay($store.s.country)">
+						<template x-for="c of countryDisplay(getCountry(items, $store.s.country))">
 
 							<li @click="
 									$store.s.column = c.p;
@@ -96,20 +100,20 @@
 
 			<header class="bar bar-nav">
 				<a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
-				<h1 class="title" x-text=" $store.s.column "></h1>
+				<h1 class="title" x-text=" resolve('0.col',  getColumn(items, $store.s.column)) "></h1>
 			</header>
 
 			<div class="content">
 
-
 				<div class="content-padded">
-					<h1 x-text=" getColumn(items, $store.s.column)[0].col  "></h1>
+					<h1 x-text=" resolve('0.col',  getColumn(items, $store.s.column))  ">
+					</h1>
 
 					<ul class="table-view">
 						<template x-for="c of getColumn(items, $store.s.column) ">
 
 							<li class="table-view-cell media"
-								@click="$store.s.country = getCountry(items, c.u); $store.s.column = ''; $store.s.page = 'country' ">
+								@click="$store.s.country = c.u; $store.s.column = ''; $store.s.page = 'country' ">
 								<div class=" media-body" x-html="`${c.country} <p>${c.value}</p>`">
 								</div>
 							</li>
@@ -135,17 +139,19 @@
 
 
 
+
+
 		<div class="content-padded">
 			<input type="search" placeholder="Filter" style="margin-bottom: 5px;" x-model.debounce.150="filterString">
 		</div>
 
-		<div class="card">
+		<div class="card" style="margin-bottom: 5rem;">
 			<ul class="table-view">
 
 				<!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
 				<template x-for="item in filterItems(filterString,items)" :key="item.u">
 
-					<li x-html="itemR(item)" @click="$store.s.country = item; $store.s.page = 'country'"
+					<li x-html="itemR(item)" @click="$store.s.country = item.u; $store.s.page = 'country'"
 						class="table-view-cell"></li>
 
 				</template>
