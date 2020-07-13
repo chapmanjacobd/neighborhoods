@@ -70,7 +70,7 @@ figcaption {
 
 a {
   font-size: 15px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   text-decoration: none;
   color: #aaa;
   transition: color 0.3s ease;

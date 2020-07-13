@@ -3,7 +3,7 @@ function getData() {
 }
 
 function getCountry(items, country) {
-  return items.filter((i) => i.u === country)[0];
+  return items.filter((i) => i.id === country)[0];
 }
 
 function getColumn(items, column) {
@@ -31,6 +31,8 @@ function countryDisplay(s) {
           "lat",
           "u",
           "c",
+          "n",
+          "id",
           "big_city",
           "co_var",
           "accessibility_to_city",
@@ -60,8 +62,13 @@ function countryDisplay(s) {
 
 function renameCountryValues(p, v) {
   if (!v) return "";
+  if (typeof v == "string") return v;
+
   if (v.length == 3) return minMaxChart(p, v);
   if (v.length == 12) return monthChart(p, v);
+
+  if (p == "dist") return Math.floor(v / 1000) + " km";
+  if (p == "noise") return v + " (dB)";
   if (typeof v == "number") return v.toLocaleString();
 
   return v;
@@ -196,8 +203,11 @@ function renameCountryValues(p, v) {
 
 function renameCountryProperties(p) {
   if (p == "big_city") return "Large city";
+  if (p == "s") return "State";
+  if (p == "noise") return "Noise";
   if (p == "pop_avg") return "Avg city population";
   if (p == "avg_dist") return "Avg city neighborhood to center distance (km)";
+  if (p == "dist") return "Avg neighborhood distance to city center";
   if (p == "avg_noise") return "Avg Noise (dB)";
   if (p == "pop_max") return "Largest city Population";
   if (p == "rain") return "Rainfall";
@@ -246,7 +256,7 @@ function itemR(item) {
   return `
     <a class="push-right">
     <i src="flags/blank.gif" class="flag flag-${item.u.toLowerCase()}"></i>
-        ${item.c}
+        ${item.n}
     </a>
 `;
 }
@@ -256,7 +266,7 @@ const c = (str) => str.toLowerCase().replace(/\s/g, "");
 function filterItems(filterString, items) {
   if (filterString)
     return items.filter((i) =>
-      [c(i.c), c(i.u)].filter(Boolean).some((s) => s.includes(c(filterString)))
+      [c(i.n), c(i.s), c(i.c), c(i.u)].filter(Boolean).some((s) => s.includes(c(filterString)))
     );
 
   return items;

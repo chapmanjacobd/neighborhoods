@@ -58,8 +58,33 @@
 					</div>
 
 					<ul class="table-view">
-						<li class="table-view-cell navigate-right"><a href="/cities.html">
-								<strong>View cities</strong></a></li>
+
+						<li class="table-view-cell navigate-right">
+							<a target="_new"
+								:href="`https://youtube.com/search?q=${resolve('big_city',  getCountry(items, $store.s.country))}, ${resolve('c',  getCountry(items, $store.s.country))}`">
+								<span class="icon la la-youtube-square"></span>
+								YouTube Search
+							</a></li>
+
+						<li class="table-view-cell navigate-right">
+							<a target="_new"
+								:href="`https://google.com/search?q=${resolve('c',  getCountry(items, $store.s.country))}`">
+								<span class="icon la la-google"></span>
+								Google Search
+							</a></li>
+
+						<li class="table-view-cell navigate-right">
+							<a target="_new"
+								:href="`https://www.google.com/maps/@${resolve('lat', getCountry(items, $store.s.country))},${resolve('lon',  getCountry(items, $store.s.country))},8z/`">
+								<span class="icon la la-map"></span>
+								View Map
+							</a></li>
+
+						<li class="table-view-cell navigate-right">
+							<a href="/cities.html">
+								<span class="icon la la-city"></span>
+								<strong>View cities</strong>
+							</a></li>
 
 						<template x-for="c of countryDisplay(getCountry(items, $store.s.country))">
 
