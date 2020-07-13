@@ -3,10 +3,38 @@ const setQueryStringParameter = (name, value) => {
   params.set(name, value);
 
   const url = decodeURIComponent(`${window.location.pathname}?${params}`);
-  window.history.replaceState({}, "", url);
+  window.history.pushState({}, "", url);
 
   return url;
 };
+
+const colors = ["#FF8E8E", "#E994AB", "#7BA7E1"];
+const rbcl = colors[Math.floor(Math.random() * colors.length)];
+
+function shadeColor(color, percent) {
+  var R = parseInt(color.substring(1, 3), 16);
+  var G = parseInt(color.substring(3, 5), 16);
+  var B = parseInt(color.substring(5, 7), 16);
+
+  R = parseInt((R * (100 + percent)) / 100);
+  G = parseInt((G * (100 + percent)) / 100);
+  B = parseInt((B * (100 + percent)) / 100);
+
+  R = R < 255 ? R : 255;
+  G = G < 255 ? G : 255;
+  B = B < 255 ? B : 255;
+
+  var RR = R.toString(16).length == 1 ? "0" + R.toString(16) : R.toString(16);
+  var GG = G.toString(16).length == 1 ? "0" + G.toString(16) : G.toString(16);
+  var BB = B.toString(16).length == 1 ? "0" + B.toString(16) : B.toString(16);
+
+  return "#" + RR + GG + BB;
+}
+
+function resolve(path, obj = "", separator = ".") {
+  var properties = Array.isArray(path) ? path : path.split(separator);
+  return properties.reduce((prev, curr) => prev && prev[curr], obj);
+}
 
 let defaultS = {
   page: "l",

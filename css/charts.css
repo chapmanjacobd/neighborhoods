@@ -1,0 +1,82 @@
+.chart {
+  background-color: #7f8c8d;
+  width: 100%;
+  height: 2em;
+  margin: 0.5em 0;
+  position: relative;
+}
+
+.chart p {
+  all: unset;
+  margin:0.2rem;
+  right: 0;
+  float: right;
+  position: relative;
+}
+
+.sparklist {
+  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.sparklist li {
+  list-style: none;
+  margin-right: 35px;
+  display: grid;
+  min-width: 14rem;
+}
+
+.sparkline {
+  position: relative;
+  display: inline-block;
+  height: 2em;
+  margin: 0 0.5em;
+  transition: all 0.5s ease;
+}
+
+.sparkline .index {
+  position: relative;
+  float: left;
+  width: 1rem;
+  height: 3em;
+}
+
+.sparkline .index .count {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: #aaa;
+  outline: 2px #bbb groove;
+  font: 0/0 a;
+  text-shadow: none;
+  color: transparent;
+}
+
+body {
+  font-family: "fira-sans-2", sans-serif;
+  /* font-weight: bold; */
+  -webkit-font-smoothing: antialiased;
+  padding: 20px;
+}
+
+figcaption {
+  margin-top: 40px;
+}
+
+a {
+  font-size: 15px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #aaa;
+  transition: color 0.3s ease;
+}
+
+a:hover,
+a:focus {
+  color: rgb(135, 154, 236);
+}

@@ -6,11 +6,6 @@ function getCountry(items, country) {
   return items.filter((i) => i.u === country)[0];
 }
 
-function resolve(path, obj = "", separator = ".") {
-  var properties = Array.isArray(path) ? path : path.split(separator);
-  return properties.reduce((prev, curr) => prev && prev[curr], obj);
-}
-
 function getColumn(items, column) {
   if (!items) return [];
   if (!column) return [];
@@ -19,7 +14,8 @@ function getColumn(items, column) {
       col: plural(renameCountryProperties(column), 2),
       country: x.c,
       u: x.u,
-      value: renameCountryValues(x[column]),
+      v: x[column],
+      value: renameCountryValues(column, x[column]),
     };
   });
 }
@@ -28,24 +24,218 @@ function countryDisplay(s) {
   if (!s) return [];
 
   return Object.entries(s)
-    .filter((x) => !["lon", "lat", "u", "c"].includes(x[0]))
-    .map((x) => ({ p: x[0], dp: renameCountryProperties(x[0]), v: renameCountryValues(x[1]) }));
+    .filter(
+      (x) =>
+        ![
+          "lon",
+          "lat",
+          "u",
+          "c",
+          "accessibility_to_city",
+          "glob_urban_min",
+          "glob_urban_avg",
+          "glob_urban_max",
+          "glob_crop_min",
+          "glob_crop_avg",
+          "glob_crop_max",
+          "forest_min",
+          "forest_avg",
+          "forest_max",
+          "glob_ve_min",
+          "glob_ve_avg",
+          "glob_ve_max",
+          "glob_wet_min",
+          "glob_wet_avg",
+          "glob_wet_max",
+        ].includes(x[0])
+    )
+    .map((x) => ({
+      p: x[0],
+      dp: renameCountryProperties(x[0]),
+      v: renameCountryValues(x[0], x[1]),
+    }));
 }
 
-function renameCountryValues(v) {
+function renameCountryValues(p, v) {
   if (!v) return "";
-  if (v.length == 3) return "<div> minavgmax </div>";
-  if (v.length == 12) return "<div> monthlydata </div>";
+  if (v.length == 3) return minMaxChart(p, v);
+  if (v.length == 12) return monthChart(p, v);
   if (typeof v == "number") return v.toLocaleString();
 
   return v;
+
+  function minMaxChart(p, v) {
+    const maximum = getMaximum();
+    const midP = v.map((x) => Math.max(0, (x / maximum) * 100));
+
+    return `
+      <div style="display:flex; justify-content: space-between;">
+        <p>${v[1]}</p>
+        <p>${v[2]}</p>
+      </div>
+      <div style="display: -webkit-box;">
+        <div class="chart" style="width: ${midP[0]}%;"></div>
+        <div class="chart" style="width: ${midP[1]}%;background: ${shadeColor(rbcl, -20)};"></div>
+        <div class="chart" style="width: ${midP[2]}%;background: ${shadeColor(rbcl, 30)};"></div>
+      </div>
+    `;
+
+    function getMaximum() {
+      if (p == "co_var") return 80000;
+      if (p == "interesting") return 8000;
+      if (p == "boring") return 5000;
+      if (p == "safety") return 241157;
+      if (p == "danger") return 8955;
+      if (p == "coastline") return 92;
+      if (p == "tourismcount") return 14291;
+      if (p == "public_transport") return 428;
+      if (p == "slope_mean") return 48545;
+      if (p == "popghs") return 276410;
+      if (p == "osmpop") return 9829485;
+      if (p == "built") return 1428571;
+      if (p == "groads_count") return 37;
+      if (p == "groads_avg_length") return 122;
+      if (p == "toilets") return 137;
+      if (p == "food") return 100;
+      if (p == "accessibility_to_city") return 1742;
+      if (p == "glob_urban_min") return 0;
+      if (p == "glob_urban_avg") return 25;
+      if (p == "glob_urban_max") return 142;
+      if (p == "glob_crop_min") return 245;
+      if (p == "glob_crop_avg") return 367;
+      if (p == "glob_crop_max") return 447;
+      if (p == "forest_min") return 130;
+      if (p == "forest_avg") return 270;
+      if (p == "forest_max") return 425;
+      if (p == "glob_ve_min") return 191;
+      if (p == "glob_ve_avg") return 372;
+      if (p == "glob_ve_max") return 491;
+      if (p == "glob_wet_min") return 15;
+      if (p == "glob_wet_avg") return 200;
+      if (p == "glob_wet_max") return 584;
+
+      // console.log(`if (p == "${p}") return ${ Math.floor(Math.max(...v) /.7)};`)
+
+      return Math.max(...v);
+    }
+  }
+
+  function monthChart(p, v) {
+    const low = v.map((a) => a[0]);
+    const mid = v.map((a) => a[1]);
+    const upp = v.map((a) => a[2]);
+
+    const avg = (mid.reduce((a, b) => a + b) / 12).toFixed(0);
+    const maximum = getMaximum();
+    const midP = mid.map((x) => (x / Number(maximum)) * 100);
+    const uppP = upp.map((x) => (x / Number(maximum)) * 100);
+    const lowP = low.map((x) => (x / Number(maximum)) * 100);
+
+    return `
+    <ul class="sparklist">
+        <li>
+         <span class="sparkline" style="top: 2rem;">
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[0]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[1]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[2]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[3]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[4]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[5]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[6]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[7]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[8]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[9]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[10]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #eee;height: ${uppP[11]}%;"> </span> </span>
+          </span>
+          <!-- Average: ${avg} -->
+          <span class="sparkline">
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[0]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[1]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[2]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[3]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[4]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[5]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[6]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[7]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[8]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[9]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[10]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: ${rbcl};height: ${midP[11]}%;"> </span> </span>
+          </span>
+          <span class="sparkline" style="top: -2rem;">
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[0]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[1]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[2]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[3]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[4]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[5]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[6]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[7]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[8]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[9]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[10]}%;">  </span> </span>
+            <span class="index"><span class="count" style="background: #444;height: ${lowP[11]}%;"> </span> </span>
+          </span>
+        </li>
+    </ul>
+    `;
+
+    function getMaximum() {
+      if (p == "rain") return 160;
+      if (p == "tmp") return 2400;
+      if (p == "srad") return 15000;
+      if (p == "wind") return 60000;
+
+      return Math.max(...mid);
+    }
+  }
 }
 
 function renameCountryProperties(p) {
   if (p == "big_city") return "Large city";
   if (p == "pop_avg") return "Avg city population";
   if (p == "avg_dist") return "Avg city neighborhood to center distance";
-  if (p == "avg_noise") return "Avg Noise";
+  if (p == "avg_noise") return "Avg Noise (dB)";
+  if (p == "pop_max") return "Largest city Population";
+  if (p == "rain") return "Rainfall";
+  if (p == "co_var") return "co var";
+  if (p == "tmp") return "Temperature";
+  if (p == "srad") return "Sun";
+  if (p == "wind") return "Wind";
+  if (p == "interesting") return "Interesting";
+  if (p == "boring") return "Boring";
+  if (p == "safety") return "Safety features";
+  if (p == "danger") return "Risk features";
+  if (p == "coastline") return "Coastline";
+  if (p == "tourismcount") return "Tourism";
+  if (p == "public_transport") return "Avg public transport per neighborhood";
+  if (p == "slope_mean") return "Avg Slope";
+  if (p == "popghs") return "Avg population (GHS)";
+  if (p == "osmpop") return "Avg population (OSM)";
+  if (p == "built") return "Built-up";
+  if (p == "groads_count") return "# of Large roads";
+  if (p == "groads_avg_length") return "Avg length of highways";
+  if (p == "toilets") return "Avg public toilets per neighborhood";
+  if (p == "food") return "Avg # of Restaurants per neighborhood";
+  if (p == "accessibility_to_city") return "Accessibility to city";
+  if (p == "glob_urban_min") return "glob urban min";
+  if (p == "glob_urban_avg") return "glob urban avg";
+  if (p == "glob_urban_max") return "glob urban max";
+  if (p == "glob_crop_min") return "glob crop min";
+  if (p == "glob_crop_avg") return "glob crop avg";
+  if (p == "glob_crop_max") return "glob crop max";
+  if (p == "forest_min") return "forest min";
+  if (p == "forest_avg") return "forest avg";
+  if (p == "forest_max") return "forest max";
+  if (p == "glob_ve_min") return "glob ve min";
+  if (p == "glob_ve_avg") return "glob ve avg";
+  if (p == "glob_ve_max") return "glob ve max";
+  if (p == "glob_wet_min") return "glob wet min";
+  if (p == "glob_wet_avg") return "glob wet avg";
+  if (p == "glob_wet_max") return "glob wet max";
+
+  // console.log(`if (p == "${p}") return "${p.replace(/_/g,' ')}";`);
 
   return p;
 }
@@ -53,8 +243,7 @@ function renameCountryProperties(p) {
 function itemR(item) {
   return `
     <a class="push-right">
-    <i src="flags/blank.gif" style=" border: 1px solid rgb(95, 95, 95); vertical-align: text-bottom;"
-							class="flag flag-${item.u.toLowerCase()}"></i>
+    <i src="flags/blank.gif" class="flag flag-${item.u.toLowerCase()}"></i>
         ${item.c}
     </a>
 `;
@@ -69,6 +258,31 @@ function filterItems(filterString, items) {
     );
 
   return items;
+}
+
+// .sort(fieldSort(["Stat", "-down", "-Px"]))
+function fieldSort(fields) {
+  var dir = [],
+    i,
+    l = fields.length;
+  fields = fields.map(function (o, i) {
+    if (o[0] === "-") {
+      dir[i] = -1;
+      o = o.substring(1);
+    } else {
+      dir[i] = 1;
+    }
+    return o;
+  });
+
+  return function (a, b) {
+    for (i = 0; i < l; i++) {
+      var o = fields[i];
+      if (a[o] > b[o]) return dir[i];
+      if (a[o] < b[o]) return -dir[i];
+    }
+    return 0;
+  };
 }
 
 console.log(

@@ -11,6 +11,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 	<link href="css/ratchet.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/charts.css">
 	<link rel="stylesheet" href="flags/flags.min.css">
 	<!-- <link href="css/ratchet-theme-android.css" rel="stylesheet"> -->
 	<link href="css/ratchet-theme-ios.css" rel="stylesheet">
@@ -46,16 +47,13 @@
 				</h1>
 			</header>
 
-
-
 			<div class="content">
 
-
-				<div class="content-padded">
+				<div id="tpC" class="content-padded">
 
 					<div style="display: flex; justify-content: space-between; align-items: baseline;">
 						<h1 x-text="resolve('c',  getCountry(items, $store.s.country))"></h1>
-						<i src="flags/blank.gif" style=" border: 1px solid rgb(95, 95, 95);"
+						<i src="flags/blank.gif"
 							:class="'flag flag-' + resolve('u',  getCountry(items, $store.s.country)).toLowerCase()"></i>
 					</div>
 
@@ -67,8 +65,8 @@
 
 							<li @click="
 									$store.s.column = c.p;
-									$store.s.country = '';
-									$store.s.page = 'column' 
+									$store.s.page = 'column';
+									location.hash = '#tpC';
 								" class="table-view-cell media">
 								<div class=" media-body" x-html="`${c.dp} <p>${c.v}</p>`">
 								</div>
@@ -105,15 +103,18 @@
 
 			<div class="content">
 
-				<div class="content-padded">
+				<div id="tpc" class="content-padded">
 					<h1 x-text=" resolve('0.col',  getColumn(items, $store.s.column))  ">
 					</h1>
 
 					<ul class="table-view">
-						<template x-for="c of getColumn(items, $store.s.column) ">
+						<template x-for="c of getColumn(items, $store.s.column).sort(fieldSort(['-v'])) ">
 
-							<li class="table-view-cell media"
-								@click="$store.s.country = c.u; $store.s.column = ''; $store.s.page = 'country' ">
+							<li class="table-view-cell media" @click="
+								$store.s.country = c.u; 
+								$store.s.page = 'country';
+								location.hash = '#tpc';
+								">
 								<div class=" media-body" x-html="`${c.country} <p>${c.value}</p>`">
 								</div>
 							</li>
@@ -138,9 +139,7 @@
 
 
 
-
-
-
+		<!-- Initial Page -->
 		<div class="content-padded">
 			<input type="search" placeholder="Filter" style="margin-bottom: 5px;" x-model.debounce.150="filterString">
 		</div>
@@ -151,8 +150,11 @@
 				<!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
 				<template x-for="item in filterItems(filterString,items)" :key="item.u">
 
-					<li x-html="itemR(item)" @click="$store.s.country = item.u; $store.s.page = 'country'"
-						class="table-view-cell"></li>
+					<li x-html="itemR(item)" @click="
+					$store.s.country = item.u;
+					$store.s.page = 'country';
+					location.hash = '#tpc';
+					" class="table-view-cell navigate-right"></li>
 
 				</template>
 			</ul>
