@@ -10,8 +10,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-    <!-- Include the compiled Ratchet CSS -->
     <link href="css/ratchet.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="flags/flags.min.css">
     <!-- <link href="css/ratchet-theme-android.css" rel="stylesheet"> -->
     <link href="css/ratchet-theme-ios.css" rel="stylesheet">
     <link rel="stylesheet"
@@ -20,44 +21,211 @@
 
     <script src="https://cdn.jsdelivr.net/gh/ryangjchandler/spruce@0.6.1/dist/spruce.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.4.1/dist/alpine.min.js"></script>
+    <script src="js/match-sorter.js"></script>
     <script src="./js/common.js"></script>
+    <script src="./js/neighborhoods.js"></script>
 </head>
 
 <body>
-    <!-- Make sure all your bars are the first things in your <body> -->
+
     <header class="bar bar-nav">
+        <a class="icon icon-left pull-left" href="/cities.html"></a>
         <h1 class="title">UNLI Neighborhoods</h1>
     </header>
-    <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
-    <div class="content" style="padding: 44px 0;">
-        <p class="content-padded">Thanks for downloading Ratchet. This is an example HTML page that's linked up to
-            compiled
-            Ratchet CSS and JS, has the proper meta tags and the HTML structure. Need some more help before you start
-            filling
-            this with your own content? Check out some Ratchet resources:</p>
+
+    <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
+        //fetch('/n.json').then(r => r.json()).then(r => items = r)
+        $store.s.city.id ? loadCity($store.s.city, items) : ''
+        " x-subscribe>
 
 
-        <div class="card">
+        <div id="loading" class="modal ">
+            <header class="bar bar-nav">
+                <h1 class="title">Loading</h1>
+            </header>
+
+            <span class="icon la la-spinner center spin" style=""></span>
+        </div>
+
+        <!-- Country Page -->
+        <div x-show=" $store.s.page === 'country'; " class="modal active" style="width: 100vw; height: 100vh;">
+
+            <header class="bar bar-nav">
+                <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
+                <h1 class="title" x-text="resolve('n',  $store.s.city)">
+                </h1>
+            </header>
+
+            <div class="content">
+
+                <div id="tpC" class="content-padded">
+
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <h1 x-text="resolve('n',  getCountry(items, $store.s.neighborhood))">
+                        </h1>
+                        <i src="flags/blank.gif"
+                            :class="'flag flag-' + resolve('u',  getCountry(items, $store.s.neighborhood)).toLowerCase()"></i>
+                    </div>
+
+                    <ul class="table-view">
+
+                        <li class="table-view-cell navigate-right">
+                            <a target="_new"
+                                :href="`https://www.google.com/maps/@${resolve('lat', getCountry(items, $store.s.neighborhood))},${resolve('lon',  getCountry(items, $store.s.neighborhood))},16z/`">
+                                <span class="icon la la-map"></span>
+                                View Map
+                            </a></li>
+
+                        <li class="table-view-cell navigate-right">
+                            <a target="_new"
+                                :href="`https://youtube.com/search?q=${resolve('n',  getCountry(items, $store.s.neighborhood))}, ${resolve('s',  getCountry(items, $store.s.neighborhood))}`">
+                                <span class="icon la la-youtube-square"></span>
+                                YouTube Search
+                            </a></li>
+
+                        <li class="table-view-cell navigate-right">
+                            <a target="_new"
+                                :href="`https://google.com/search?q=${resolve('n',  getCountry(items, $store.s.neighborhood))}, ${resolve('s',  getCountry(items, $store.s.neighborhood))}`">
+                                <span class="icon la la-google"></span>
+                                Google Search
+                            </a></li>
+
+
+
+
+                        <template x-for="c of countryDisplay(getCountry(items, $store.s.neighborhood))">
+
+                            <li @click="
+									$store.s.column = c.p;
+									$store.s.page = 'column';
+									location.hash = '#tpC';
+								" class="table-view-cell media">
+                                <div class=" media-body" x-html="`${c.dp} <p>${c.v}</p>`">
+                                </div>
+                            </li>
+
+                        </template>
+                    </ul>
+
+                    <div class="">
+                        <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded"
+                            @click="$store.s.page = 'l'">
+                            Close
+                        </button>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+
+
+
+        <!-- Column Page -->
+        <div class="modal active" style="width: 100vw; height: 100vh;" x-show=" $store.s.page === 'column' ">
+
+            <header class="bar bar-nav">
+                <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
+                <h1 class="title" x-text=" stripHTML(resolve('0.col',  getColumn(items, $store.s.column))) "></h1>
+            </header>
+
+            <div class="content">
+
+                <div id="tpc" class="content-padded">
+                    <h1 x-text=" stripHTML(resolve('0.col',  getColumn(items, $store.s.column))) ">
+                    </h1>
+
+                    <ul class="table-view">
+                        <template x-for="c of getColumn(items, $store.s.column).sort(fieldSort(['-v'])) ">
+
+                            <li class="table-view-cell media" @click="
+								$store.s.neighborhood = c.n;
+								$store.s.page = 'country';
+								location.hash = '#tpc';
+								">
+                                <div class=" media-body" x-html="`${c.n} <p>${c.value}</p>`">
+                                </div>
+                            </li>
+
+                        </template>
+                    </ul>
+
+                    <div class="">
+                        <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded"
+                            @click="$store.s.page = 'l'">
+                            Close
+                        </button>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Initial Page -->
+        <div class="content-padded" style="display: flex;">
+            <input type="search"
+                :placeholder="items.length == 0 ? 'Search Cities' : 'Filter Neighborhoods / Search Cities'"
+                style="margin-bottom: 5px;" x-model.debounce.150="filterString"
+                x-on:keydown.enter="searchCity(filterString,items);">
+            <a class="icon icon-search pull-right" href="#" @click="
+            searchCity(filterString,items);
+            " style="line-height: 1.5; padding: 0 0.3rem 0 0.6rem;"></a>
+        </div>
+
+        <div class="content-padded" x-show="items.length == 0">
+            <p>No data loaded. Search for and select a city.</p>
+        </div>
+
+        <div class="content-padded" x-show="items.length != 0">
+            <p x-text="resolve('n',  $store.s.city)"></p>
+        </div>
+
+        <div class="card" style="margin-bottom: 5rem;">
             <ul class="table-view">
 
-                <!-- https://unli.xyz/neighbourhoods/api/getNeighborhoods?k=7200 -->
-                <template x-data="{items: []}" x-init="fetch('/n.json').then(r => r.json()).then(r => items = r)"
-                    x-for="item in items" :key="item.id">
-                    <li x-html="`<a class='push-right'>${item.n}</a>`" class="table-view-cell"></li>
+                <!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
+                <template x-for="item in filterItems(filterString,items)" :key="item.n">
+
+                    <li x-html="itemR(item)" @click="
+                    if (item.displayname) {
+                        loadCity(item, items);
+                    } else {
+                        console.log('clicked', item);
+                        $store.s.neighborhood = item.n;
+                        $store.s.page = 'country';
+                        location.hash = '#tpc';
+                    }
+                    filterString = '';
+					" class="table-view-cell navigate-right"></li>
+
                 </template>
             </ul>
         </div>
+
+
+
+
+
     </div>
 
 
 
-
     <nav class="bar bar-tab" style="bottom: 0; top: unset;">
-        <a class="tab-item" href="/">
+        <a class="tab-item " href="/">
             <span class="icon la la-globe"></span>
             <span class="tab-label">Countries</span>
         </a>
-        <a class="tab-item" href="/cities.html">
+        <a class="tab-item " href="/cities.html">
             <span class="icon la la-city"></span>
             <span class="tab-label">Cities</span>
         </a>

@@ -10,8 +10,10 @@ const setQueryStringParameter = (name, value) => {
 
 let defaultS = {
   page: "l",
-  country: {},
   column: {},
+  country: {},
+  city: {},
+  neighborhood: {},
 };
 
 Spruce.store("s", {});
@@ -27,7 +29,7 @@ if (typeof gotSFromURL === "undefined") {
     if (urlParams.has(key)) {
       var sParam = JSON.parse(urlParams.get(key));
 
-      if (sParam != null) {
+      if (sParam != "undefined" && sParam != null) {
         Object.assign(sFromURL, { [key]: sParam });
       }
     } else {
@@ -44,7 +46,17 @@ Object.keys(defaultS).forEach((key, index) => {
   });
 });
 
-// 
+//
+
+function stripHTML(text) {
+  if (!text) return "";
+  if (typeof text !== "string") return text;
+  return text
+    .replace(/<style[^>]*>.*<\/style>/gm, "")
+    .replace(/<script[^>]*>.*<\/script>/gm, "")
+    .replace(/<[^>]+>/gm, "")
+    .replace(/([\r\n]+ +)+/gm, "");
+}
 
 function plural(word, amount) {
   if (amount !== undefined && amount === 1) {
