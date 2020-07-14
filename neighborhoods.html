@@ -140,7 +140,7 @@
                     </h1>
 
                     <ul class="table-view">
-                        <template x-for="c of getColumn(items, $store.s.column).sort(fieldSort(['-v'])) ">
+                        <template x-for="c of getColumn(items, $store.s.column) ">
 
                             <li class="table-view-cell media" @click="
 								$store.s.neighborhood = c.n;
