@@ -260,10 +260,9 @@ function itemR(item) {
 const c = (str) => str.toLowerCase().replace(/\s/g, "");
 
 function filterItems(filterString, items) {
-  if (filterString)
-    return items.filter((i) =>
-      [c(i.c), c(i.u)].filter(Boolean).some((s) => s.includes(c(filterString)))
-    );
+  if (!filterString) return items;
 
-  return items;
+  return matchSorter(items, filterString, {
+    keys: ["u", "c"],
+  });
 }

@@ -21,6 +21,7 @@
 
 	<script src="https://cdn.jsdelivr.net/gh/ryangjchandler/spruce@0.6.1/dist/spruce.umd.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.4.1/dist/alpine.min.js"></script>
+	<script src="./js/match-sorter.js"></script>
 	<script src="./js/common.js"></script>
 	<script src="./js/countries.js"></script>
 </head>
@@ -32,7 +33,7 @@
 	</header>
 
 	<div class="content" style="padding: 44px 0;" x-data="getData()"
-		x-init="fetch('/countries.json').then(r => r.json()).then(r => items = r)" x-subscribe>
+		x-init="fetch('./countries.json').then(r => r.json()).then(r => items = r)" x-subscribe>
 
 
 
@@ -82,7 +83,7 @@
 
 						<li class="table-view-cell navigate-right">
 							<a
-								:href="'/cities.html?country=' + encodeURIComponent(JSON.stringify(getCountryURLFormat(items, $store.s.country)))">
+								:href="'./cities.html?country=' + encodeURIComponent(JSON.stringify(getCountryURLFormat(items, $store.s.country)))">
 
 								<span class="icon la la-city"></span>
 								<strong>View cities</strong>
@@ -196,15 +197,15 @@
 
 
 	<nav class="bar bar-tab" style="bottom: 0; top: unset;">
-		<a class="tab-item active" href="/">
+		<a class="tab-item active" href="./">
 			<span class="icon la la-globe"></span>
 			<span class="tab-label">Countries</span>
 		</a>
-		<a class="tab-item" href="/cities.html">
+		<a class="tab-item" href="./cities.html">
 			<span class="icon la la-city"></span>
 			<span class="tab-label">Cities</span>
 		</a>
-		<a class="tab-item" href="/neighborhoods.html">
+		<a class="tab-item" href="./neighborhoods.html">
 			<span class="icon la la-home"></span>
 			<span class="tab-label">Neighborhoods</span>
 		</a>
