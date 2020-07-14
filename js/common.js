@@ -20,9 +20,7 @@ Spruce.store("s", {});
 
 function JSONParse(text, reviver) {
   try {
-    return {
-      value: JSON.parse(text, reviver),
-    };
+    return JSON.parse(text, reviver);
   } catch (ex) {
     return null;
   }

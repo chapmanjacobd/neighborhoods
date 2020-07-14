@@ -35,6 +35,7 @@
 
     <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
         //fetch('/cities.json').then(r => r.json()).then(r => items = r)
+        console.log($store.s.country)
         $store.s.country.id ? loadCountry($store.s.country, items) : ''
         " x-subscribe>
 
@@ -158,7 +159,7 @@
 								$store.s.page = 'country';
 								location.hash = '#tpc';
 								">
-                                <div class=" media-body" x-html="`${c.country} <p>${c.value}</p>`">
+                                <div class=" media-body" x-html="`${c.city} <p>${c.value}</p>`">
                                 </div>
                             </li>
 

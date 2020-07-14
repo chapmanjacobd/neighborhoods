@@ -12,6 +12,7 @@ function getColumn(items, column) {
   return items.map((x) => {
     return {
       col: plural(renameCountryProperties(column), 2),
+      city: x.n,
       country: x.c,
       u: x.u,
       v: x[column],
@@ -19,7 +20,6 @@ function getColumn(items, column) {
     };
   });
 }
-
 
 function renameCountryValues(p, v) {
   if (!v) return "";
@@ -260,7 +260,9 @@ function loadCountry(item, items) {
         .then((res) => res.json())
         .then((res) => {
           items.splice(0);
-          items.push(...res.map((x) => ({ ...x, city: item.displayname, cityId: item.id })));
+          items.push(
+            ...res.map((x) => ({ ...x, city: item.displayname || item.n, cityId: item.id }))
+          );
           $store.s.country = { id: item.id, n: item.displayname || item.n };
         });
     } catch (err) {
