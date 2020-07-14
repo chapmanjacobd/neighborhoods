@@ -371,26 +371,6 @@ function filterItems(filterString, items) {
   });
 }
 
-function loadCity(item, items) {
-  document.getElementById("loading").classList.add("active");
-  (async function () {
-    try {
-      await fetch(`https://unli.xyz/neighbourhoods/api/getNeighborhoods?k=${item.id}`)
-        .then((res) => res.json())
-        .then((res) => {
-          items.splice(0);
-          items.push(...res.map((x) => ({ ...x, city: item.displayname, cityId: item.id })));
-          $store.s.city = { id: item.id, n: item.displayname || item.n };
-        });
-    } catch (err) {
-      console.log(err);
-    }
-
-    document.getElementById("loading").classList.remove("active");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  })();
-}
-
 function searchCity(searchString, items) {
   (async function () {
     try {
@@ -408,5 +388,25 @@ function searchCity(searchString, items) {
     } catch (err) {
       console.log(err);
     }
+  })();
+}
+
+function loadCity(item, items) {
+  document.getElementById("loading").classList.add("active");
+  (async function () {
+    try {
+      await fetch(`https://unli.xyz/neighbourhoods/api/getNeighborhoods?k=${item.id}`)
+        .then((res) => res.json())
+        .then((res) => {
+          items.splice(0);
+          items.push(...res.map((x) => ({ ...x, city: item.displayname, cityId: item.id })));
+          $store.s.city = { id: item.id, n: item.displayname || item.n };
+        });
+    } catch (err) {
+      console.log(err);
+    }
+
+    document.getElementById("loading").classList.remove("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   })();
 }

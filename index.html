@@ -81,7 +81,9 @@
 							</a></li>
 
 						<li class="table-view-cell navigate-right">
-							<a href="/cities.html">
+							<a
+								:href="'/cities.html?country=' + encodeURIComponent(JSON.stringify(getCountryURLFormat(items, $store.s.country)))">
+
 								<span class="icon la la-city"></span>
 								<strong>View cities</strong>
 							</a></li>

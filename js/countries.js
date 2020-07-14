@@ -6,6 +6,12 @@ function getCountry(items, country) {
   return items.filter((i) => i.u === country)[0];
 }
 
+function getCountryURLFormat(items, country) {
+  const c = getCountry(items, country);
+  if (!c) return "";
+  return { id: c.u, n: c.c };
+}
+
 function getColumn(items, column) {
   if (!items) return [];
   if (!column) return [];

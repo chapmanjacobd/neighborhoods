@@ -21,6 +21,7 @@
 
     <script src="https://cdn.jsdelivr.net/gh/ryangjchandler/spruce@0.6.1/dist/spruce.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.4.1/dist/alpine.min.js"></script>
+    <script src="js/match-sorter.js"></script>
     <script src="./js/common.js"></script>
     <script src="./js/cities.js"></script>
 </head>
@@ -32,9 +33,20 @@
         <h1 class="title">UNLI Cities</h1>
     </header>
 
-    <div class="content" style="padding: 44px 0;" x-data="getData()"
-        x-init="fetch('/cities.json').then(r => r.json()).then(r => items = r)" x-subscribe>
+    <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
+        //fetch('/cities.json').then(r => r.json()).then(r => items = r)
+        $store.s.country.id ? loadCountry($store.s.country, items) : ''
+        " x-subscribe>
 
+
+
+        <div id="loading" class="modal ">
+            <header class="bar bar-nav">
+                <h1 class="title">Loading</h1>
+            </header>
+
+            <span class="icon la la-spinner center spin" style=""></span>
+        </div>
 
 
 
@@ -44,7 +56,7 @@
             <header class="bar bar-nav">
                 <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
                 <h1 class="title"
-                    x-text="resolve('n',  getCountry(items, $store.s.country)) + ' (' + resolve('s',  getCountry(items, $store.s.country)) + '), ' + resolve('c',  getCountry(items, $store.s.country))">
+                    x-text="resolve('n',  $store.s.city) + ' (' + resolve('s',  getCountry(items, $store.s.city.id)) + '), ' + resolve('n',  $store.s.country)">
                 </h1>
             </header>
 
@@ -53,17 +65,16 @@
                 <div id="tpC" class="content-padded">
 
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <h1
-                            x-text="resolve('n',  getCountry(items, $store.s.country))">
+                        <h1 x-text="resolve('n',  getCountry(items, $store.s.city.id))">
                         </h1>
                         <i src="flags/blank.gif"
-                            :class="'flag flag-' + resolve('u',  getCountry(items, $store.s.country)).toLowerCase()"></i>
+                            :class="'flag flag-' + resolve('u',  getCountry(items, $store.s.city.id)).toLowerCase()"></i>
                     </div>
 
                     <ul class="table-view">
 
                         <li class="table-view-cell navigate-right">
-                            <a href="/neighborhoods.html">
+                            <a :href="'/neighborhoods.html?city=' + encodeURIComponent(JSON.stringify($store.s.city))">
                                 <span class="icon la la-home"></span>
                                 <strong>View neighborhoods</strong>
                             </a></li>
@@ -71,21 +82,21 @@
 
                         <li class="table-view-cell navigate-right">
                             <a target="_new"
-                                :href="`https://www.google.com/maps/@${resolve('lat', getCountry(items, $store.s.country))},${resolve('lon',  getCountry(items, $store.s.country))},12z/`">
+                                :href="`https://www.google.com/maps/@${resolve('lat', getCountry(items, $store.s.city.id))},${resolve('lon',  getCountry(items, $store.s.city.id))},12z/`">
                                 <span class="icon la la-map"></span>
                                 View Map
                             </a></li>
 
                         <li class="table-view-cell navigate-right">
                             <a target="_new"
-                                :href="`https://youtube.com/search?q=${resolve('n',  getCountry(items, $store.s.country))}, ${resolve('c',  getCountry(items, $store.s.country))}`">
+                                :href="`https://youtube.com/search?q=${resolve('n',  getCountry(items, $store.s.city.id))}, ${resolve('c',  getCountry(items, $store.s.city.id))}`">
                                 <span class="icon la la-youtube-square"></span>
                                 YouTube Search
                             </a></li>
 
                         <li class="table-view-cell navigate-right">
                             <a target="_new"
-                                :href="`https://google.com/search?q=${resolve('n',  getCountry(items, $store.s.country))}, ${resolve('c',  getCountry(items, $store.s.country))}`">
+                                :href="`https://google.com/search?q=${resolve('n',  getCountry(items, $store.s.city.id))}, ${resolve('c',  getCountry(items, $store.s.city.id))}`">
                                 <span class="icon la la-google"></span>
                                 Google Search
                             </a></li>
@@ -93,7 +104,7 @@
 
 
 
-                        <template x-for="c of countryDisplay(getCountry(items, $store.s.country))">
+                        <template x-for="c of countryDisplay(getCountry(items, $store.s.city.id))">
 
                             <li @click="
 									$store.s.column = c.p;
@@ -172,8 +183,22 @@
 
 
         <!-- Initial Page -->
-        <div class="content-padded">
-            <input type="search" placeholder="Filter" style="margin-bottom: 5px;" x-model.debounce.150="filterString">
+        <div class="content-padded" style="display: flex;">
+            <input type="search" :placeholder="items.length == 0 ? 'Search Cities' : 'Filter / Search Cities'"
+                style="margin-bottom: 5px;" x-model.debounce.150="filterString"
+                x-on:keydown.enter="searchCountry(filterString,items);">
+            <a class="icon icon-search pull-right" href="#" @click="
+            searchCountry(filterString,items);
+            " style="line-height: 1.5; padding: 0 0.3rem 0 0.6rem;"></a>
+        </div>
+
+
+        <div class="content-padded" x-show="items.length == 0">
+            <p>No data loaded. Search for and select a country.</p>
+        </div>
+
+        <div class="content-padded" x-show="items.length != 0">
+            <p x-text="resolve('n',  $store.s.country)"></p>
         </div>
 
         <div class="card" style="margin-bottom: 5rem;">
@@ -183,9 +208,16 @@
                 <template x-for="item in filterItems(filterString,items)" :key="item.id">
 
                     <li x-html="itemR(item)" @click="
-					$store.s.country = item.id;
-					$store.s.page = 'country';
-					location.hash = '#tpc';
+					if (item.displayname) {
+                        loadCountry(item, items);
+                        $store.s.country = {id: item.id, n: item.n};
+                    } else {
+                        console.log('clicked', item);
+                        $store.s.city = {id: item.id, n: item.n};
+                        $store.s.page = 'country';
+                        location.hash = '#tpc';
+                    }
+                    filterString = '';
 					" class="table-view-cell navigate-right"></li>
 
                 </template>
