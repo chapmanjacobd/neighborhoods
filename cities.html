@@ -204,15 +204,15 @@
         <div class="card" style="margin-bottom: 5rem;">
             <ul class="table-view">
 
-                <!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
-                <template x-for="item in filterItems(filterString,items)" :key="item.id">
+                <template x-for="item in filterItems(filterString,items)" :key="item.n">
 
                     <li x-html="itemR(item)" @click="
 					if (item.displayname) {
+                        console.log('clicked country', item);
                         loadCountry(item, items);
                         $store.s.country = {id: item.id, n: item.n};
                     } else {
-                        console.log('clicked', item);
+                        console.log('clicked city', item);
                         $store.s.city = {id: item.id, n: item.n};
                         $store.s.page = 'country';
                         location.hash = '#tpc';

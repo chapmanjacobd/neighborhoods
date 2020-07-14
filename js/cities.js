@@ -281,7 +281,7 @@ function searchCountry(searchString, items) {
             ...res.map((x) => ({
               ...x,
               n: x.displayname,
-              u: x.displayname.substring(x.displayname.length - 3).slice(0, -1),
+              u: x.id.toLowerCase(),
             }))
           )
         );
