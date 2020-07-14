@@ -420,6 +420,11 @@ function renameCountryValues(p, v) {
       if (p == "elevation") return 800;
       if (p == "popc") return 15795;
       if (p == "popd_sum") return 19632;
+      if (p == "osm_interesting_interesting_sum_sum") return 910695;
+      if (p == "osm_boring_boring_sum") return 1424238;
+      if (p == "flickr2_lowview_count_total_sum") return 6014;
+      if (p == "flickr2_medview_count_total_sum") return 6675;
+      if (p == "flickr2_highview_count_total_sum") return 232;
 
       // console.log(`if (p == "${p}") return ${ Math.floor(v /.7)};`)
 

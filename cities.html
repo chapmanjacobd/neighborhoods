@@ -75,13 +75,6 @@
                     <ul class="table-view">
 
                         <li class="table-view-cell navigate-right">
-                            <a :href="'./neighborhoods.html?city=' + encodeURIComponent(JSON.stringify($store.s.city))">
-                                <span class="icon la la-home"></span>
-                                <strong>View neighborhoods</strong>
-                            </a></li>
-
-
-                        <li class="table-view-cell navigate-right">
                             <a target="_new"
                                 :href="`https://www.google.com/maps/@${resolve('lat', getCountry(items, $store.s.city.id))},${resolve('lon',  getCountry(items, $store.s.city.id))},12z/`">
                                 <span class="icon la la-map"></span>
@@ -102,6 +95,12 @@
                                 Google Search
                             </a></li>
 
+
+                        <li class="table-view-cell navigate-right">
+                            <a :href="'./neighborhoods.html?city=' + encodeURIComponent(JSON.stringify($store.s.city))">
+                                <span class="icon la la-home"></span>
+                                <strong>View neighborhoods</strong>
+                            </a></li>
 
 
 
