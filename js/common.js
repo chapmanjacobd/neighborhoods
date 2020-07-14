@@ -228,58 +228,31 @@ function countryDisplay(s) {
     "food",
     "public_transport",
     "toilets",
+    "tourismcount",
+    "flickr2_lowview_count_total_sum",
+    "flickr2_medview_count_total_sum",
+    "flickr2_highview_count_total_sum",
     "popghs",
+    "osm_interesting_interesting_sum_sum",
+    "osm_boring_boring_sum",
     "interesting",
     "boring",
     "safety",
     "danger",
     "coastline",
+    "noise",
+    "rain",
+    "tmp",
+    "wind",
+    "glob_forest",
+    "glob_urban",
+    "glob_crop",
+    "glob_ve",
+    "glob_wet",
   ].reverse();
 
   return Object.entries(s)
-    .filter(
-      (x) =>
-        ![
-          "lon",
-          "lat",
-          "u",
-          "c",
-          "n",
-          "s",
-          "id",
-          "big_city",
-          "co_var",
-          "accessibility_to_city",
-          "navw",
-          "glob_urban_min",
-          "glob_urban_avg",
-          "glob_urban_max",
-          "glob_crop_min",
-          "glob_crop_avg",
-          "glob_crop_max",
-          "forest_min",
-          "nightlights",
-          "cityId",
-          "forest_avg",
-          "forest_max",
-          "glob_ve_min",
-          "glob_ve_avg",
-          "glob_ve_max",
-          "glob_wet_min",
-          "glob_wet_avg",
-          "glob_wet_max",
-          "interesting_comp",
-          "boring_comp",
-          "safe_comp",
-          "danger_comp",
-          "osmn",
-          "popd",
-          "rain",
-          "tmp",
-          "srad",
-          "wind",
-        ].includes(x[0])
-    )
+    .filter((x) => sortedBy.includes(x[0]))
     .filter((x) => x[1])
     .filter((x) => (typeof x[1] === "object" ? x[1].reduce((a, b) => a + b) !== 0 : true))
     .map((x) => ({
@@ -349,14 +322,52 @@ function renameCountryProperties(p) {
   if (p == "ppp") return "ppp";
   if (p == "nightlights") return "nightlights";
   if (p == "groads") return "groads";
-  if (p == "glob_crop") return "glob crop";
+  if (p == "glob_crop") return "glob croplands";
   if (p == "glob_forest") return "glob forest";
-  if (p == "glob_ve") return "glob ve";
-  if (p == "glob_wet") return "glob wet";
+  if (p == "glob_ve") return "glob vegetation";
+  if (p == "glob_wet") return "glob wetlands";
   if (p == "glob_urban") return "glob urban";
   if (p == "navw") return "navw";
   if (p == "popd") return "popd";
-
+  if (p == "osm_interesting_interesting_sum_sum") return "Total interesting features";
+  if (p == "osm_boring_boring_sum") return "Total boring features";
+  if (p == "osm_safe_safety_sum") return "Total safety features";
+  if (p == "danger_sum") return "Total risky features";
+  if (p == "coastline_100m_count_sum") return "coastline 100m Total";
+  if (p == "flickr2_lowview_count_total_sum") return "Solo tourists";
+  if (p == "flickr2_medview_count_total_sum") return "Family tourists";
+  if (p == "flickr2_highview_count_total_sum") return "Celebrity tourists";
+  if (p == "public_transport_sum") return "Total public transport";
+  if (p == "slope100m__mean_sum") return "Total slope100m  ";
+  if (p == "ghs_gpw_pop_2015__sum_sum") return "ghs gpw pop 2015  sum sum";
+  if (p == "ghs_built_lds__mean_sum") return "Total ghs built lds  ";
+  if (p == "toilets_sum") return "toilets sum";
+  if (p == "food_sum") return "food sum";
+  if (p == "access_50k_mean_sum") return "access Total 50k ";
+  if (p == "navwater2009__mean_sum") return "Total navwater2009  ";
+  if (p == "globcover_urban_sum") return "globcover urban sum";
+  if (p == "globcover_irrigated_cropland_sum") return "globcover irrigated cropland sum";
+  if (p == "globcover_rainfed_cropland_sum") return "globcover rainfed cropland sum";
+  if (p == "globcover_mosiac_cropland_sum") return "globcover mosiac cropland sum";
+  if (p == "dryadv3croplands1992_mean_sum") return "Total dryadv3croplands1992 ";
+  if (p == "globcover_semideciduous_sum") return "globcover semideciduous sum";
+  if (p == "globcover_closed_needleleaved_sum") return "globcover closed needleleaved sum";
+  if (p == "globcover_shrubland_sum") return "globcover shrubland sum";
+  if (p == "globcover_herbaceous_vegetation_sum") return "globcover herbaceous vegetation sum";
+  if (p == "globcover_mosiac_vegetation_sum") return "globcover mosiac vegetation sum";
+  if (p == "globcover_bare_sum") return "globcover bare sum";
+  if (p == "gm_ve_v2__mean_sum") return "gm ve Total v2  ";
+  if (p == "globcover_regularly_flooded_forest_sum")
+    return "globcover regularly flooded forest sum";
+  if (p == "globcover_permanently_flooded_forest_sum")
+    return "globcover permanently flooded forest sum";
+  if (p == "globcover_marsh_sum") return "globcover marsh sum";
+  if (p == "globcover_water_sum") return "globcover water sum";
+  if (p == "hotels_com_price_avg") return "hotels com price avg";
+  if (p == "hotels_com_price_min") return "hotels com price min";
+  if (p == "hotels_com_count") return "hotels com count";
+  if (p == "hcid") return "hcid";
+  if (p == "hc_count") return "hc count";
   // console.log(`if (p == "${p}") return "${p.replace(/_/g,' ')}";`);
 
   return p;
@@ -406,7 +417,6 @@ function renameCountryValues(p, v) {
       if (p == "groads_avg_length") return 50;
       if (p == "toilets") return 30;
       if (p == "food") return 40;
-
       if (p == "elevation") return 800;
       if (p == "popc") return 15795;
       if (p == "popd_sum") return 19632;
@@ -569,17 +579,17 @@ function getColumn(items, column) {
         value: renameCountryValues(column, x[column]),
       };
     })
-    .sort((b, a) => niceSum(a) - niceSum(b.v));
+    .sort((b, a) => niceSum(a.v) - niceSum(b.v));
 }
 
 function niceSum(val) {
-  if (!val.v) return val;
-  if (val.v[1] == null) return val;
-  if (val.v[1].length > 1) return val.v[1].reduce((s, c) => s + c) / val.v[1].length;
-  if (val.v[1]) return val.v[1];
-  if (isIterable(val.v)) return Math.max(...val.v);
+  if (!val) return val;
+  if (val[1] == null) return val;
+  if (val[1].length > 1) return val[1].reduce((s, c) => s + c) / val[1].length;
+  if (val[1]) return val[1];
+  if (isIterable(val)) return Math.max(...val);
 
-  return val.v;
+  return val;
 }
 
 function isIterable(obj) {
