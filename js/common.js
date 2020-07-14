@@ -18,6 +18,16 @@ let defaultS = {
 
 Spruce.store("s", {});
 
+function JSONParse(text, reviver) {
+  try {
+    return {
+      value: JSON.parse(text, reviver),
+    };
+  } catch (ex) {
+    return null;
+  }
+}
+
 // get s
 if (typeof gotSFromURL === "undefined") {
   window.gotSFromURL = true;
@@ -27,9 +37,9 @@ if (typeof gotSFromURL === "undefined") {
   let sFromURL = {};
   Object.keys(defaultS).forEach((key, index) => {
     if (urlParams.has(key)) {
-      var sParam = JSON.parse(urlParams.get(key));
+      var sParam = JSONParse(urlParams.get(key));
 
-      if (sParam != "undefined" && sParam != null) {
+      if (sParam != null) {
         Object.assign(sFromURL, { [key]: sParam });
       }
     } else {
