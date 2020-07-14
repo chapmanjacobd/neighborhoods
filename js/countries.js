@@ -26,43 +26,6 @@ function getColumn(items, column) {
   });
 }
 
-function countryDisplay(s) {
-  if (!s) return [];
-
-  return Object.entries(s)
-    .filter(
-      (x) =>
-        ![
-          "lon",
-          "lat",
-          "u",
-          "c",
-          "big_city",
-          "co_var",
-          "accessibility_to_city",
-          "glob_urban_min",
-          "glob_urban_avg",
-          "glob_urban_max",
-          "glob_crop_min",
-          "glob_crop_avg",
-          "glob_crop_max",
-          "forest_min",
-          "forest_avg",
-          "forest_max",
-          "glob_ve_min",
-          "glob_ve_avg",
-          "glob_ve_max",
-          "glob_wet_min",
-          "glob_wet_avg",
-          "glob_wet_max",
-        ].includes(x[0])
-    )
-    .map((x) => ({
-      p: x[0],
-      dp: renameCountryProperties(x[0]),
-      v: renameCountryValues(x[0], x[1]),
-    }));
-}
 
 function renameCountryValues(p, v) {
   if (!v) return "";

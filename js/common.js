@@ -45,6 +45,77 @@ Object.keys(defaultS).forEach((key, index) => {
     setQueryStringParameter(key, encodeURIComponent(JSON.stringify(next)));
   });
 });
+//
+
+function countryDisplay(s) {
+  if (!s) return [];
+
+  const sortedBy = [
+    "dist",
+    "food",
+    "public_transport",
+    "toilets",
+    "popghs",
+    "interesting",
+    "boring",
+    "safety",
+    "danger",
+    "coastline",
+  ].reverse();
+
+  return Object.entries(s)
+    .filter(
+      (x) =>
+        ![
+          "lon",
+          "lat",
+          "u",
+          "c",
+          "n",
+          "s",
+          "id",
+          "big_city",
+          "co_var",
+          "accessibility_to_city",
+          "navw",
+          "glob_urban_min",
+          "glob_urban_avg",
+          "glob_urban_max",
+          "glob_crop_min",
+          // "glob_crop_avg",
+          "glob_crop_max",
+          "forest_min",
+          "nightlights",
+          "cityId",
+          "forest_avg",
+          "forest_max",
+          "glob_ve_min",
+          "glob_ve_avg",
+          "glob_ve_max",
+          "glob_wet_min",
+          "glob_wet_avg",
+          "glob_wet_max",
+          "interesting_comp",
+          "boring_comp",
+          "safe_comp",
+          "danger_comp",
+          "osmn",
+          "popd",
+          "rain",
+          "tmp",
+          "srad",
+          "wind",
+        ].includes(x[0])
+    )
+    .filter((x) => x[1])
+    .filter((x) => (typeof x[1] === "object" ? x[1].reduce((a, b) => a + b) !== 0 : true))
+    .map((x) => ({
+      p: x[0],
+      dp: renameCountryProperties(x[0]),
+      v: renameCountryValues(x[0], x[1]),
+    }))
+    .sort((b, a) => sortedBy.indexOf(a.p) - sortedBy.indexOf(b.p));
+}
 
 //
 
