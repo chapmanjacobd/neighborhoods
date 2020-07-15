@@ -1,5 +1,5 @@
-function getCountry(items, country) {
-  return items.filter((i) => i.id === country)[0];
+function getCity(items, city) {
+  return items.filter((i) => i.id === city)[0];
 }
 
 function itemR(item) {
@@ -47,10 +47,8 @@ function loadCountry(item, items) {
         .then((res) => res.json())
         .then((res) => {
           items.splice(0);
-          items.push(
-            ...res.map((x) => ({ ...x, city: item.displayname || item.n, cityId: item.id }))
-          );
-          $store.s.country = { id: item.id, n: item.displayname || item.n };
+          items.push(...res);
+          $store.s.country = { id: item.id, n: item.displayname };
         });
     } catch (err) {
       console.log(err);

@@ -35,7 +35,6 @@
 
     <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
         //fetch('/cities.json').then(r => r.json()).then(r => items = r)
-        console.log($store.s.country)
         $store.s.country.id ? loadCountry($store.s.country, items) : ''
         " x-subscribe>
 
@@ -57,7 +56,7 @@
             <header class="bar bar-nav">
                 <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
                 <h1 class="title"
-                    x-text="resolve('n',  $store.s.city) + ' (' + resolve('s',  getCountry(items, $store.s.city.id)) + '), ' + resolve('n',  $store.s.country)">
+                    x-text="$store.s.city.n + ' (' + resolve('s',  getCity(items, $store.s.city.id)) + '), ' + resolve('n',  $store.s.country)">
                 </h1>
             </header>
 
@@ -66,31 +65,31 @@
                 <div id="tpC" class="content-padded">
 
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <h1 x-text="resolve('n',  getCountry(items, $store.s.city.id))">
+                        <h1 x-text="resolve('n',  getCity(items, $store.s.city.id))">
                         </h1>
                         <i src="flags/blank.gif"
-                            :class="'flag flag-' + resolve('u',  getCountry(items, $store.s.city.id)).toLowerCase()"></i>
+                            :class="'flag flag-' + resolve('u',  getCity(items, $store.s.city.id)).toLowerCase()"></i>
                     </div>
 
                     <ul class="table-view">
 
                         <li class="table-view-cell navigate-right">
                             <a target="_new"
-                                :href="`https://www.google.com/maps/@${resolve('lat', getCountry(items, $store.s.city.id))},${resolve('lon',  getCountry(items, $store.s.city.id))},12z/`">
+                                :href="`https://www.google.com/maps/@${resolve('lat', getCity(items, $store.s.city.id))},${resolve('lon',  getCity(items, $store.s.city.id))},12z/`">
                                 <span class="icon la la-map"></span>
                                 View Map
                             </a></li>
 
                         <li class="table-view-cell navigate-right">
                             <a target="_new"
-                                :href="`https://youtube.com/search?q=${resolve('n',  getCountry(items, $store.s.city.id))}, ${resolve('c',  getCountry(items, $store.s.city.id))}`">
+                                :href="`https://youtube.com/search?q=${resolve('n',  getCity(items, $store.s.city.id))}, ${resolve('c',  getCity(items, $store.s.city.id))}`">
                                 <span class="icon la la-youtube-square"></span>
                                 YouTube Search
                             </a></li>
 
                         <li class="table-view-cell navigate-right">
                             <a target="_new"
-                                :href="`https://google.com/search?q=${resolve('n',  getCountry(items, $store.s.city.id))}, ${resolve('c',  getCountry(items, $store.s.city.id))}`">
+                                :href="`https://google.com/search?q=${resolve('n',  getCity(items, $store.s.city.id))}, ${resolve('c',  getCity(items, $store.s.city.id))}`">
                                 <span class="icon la la-google"></span>
                                 Google Search
                             </a></li>
@@ -104,7 +103,7 @@
 
 
 
-                        <template x-for="c of countryDisplay(getCountry(items, $store.s.city.id))">
+                        <template x-for="c of countryDisplay(getCity(items, $store.s.city.id))">
 
                             <li @click="
 									$store.s.column = c.p;
@@ -154,9 +153,9 @@
                         <template x-for="c of getColumn(items, $store.s.column) ">
 
                             <li class="table-view-cell media" @click="
-								$store.s.country = c.u; 
+                                $store.s.city = {id: c.cityId, n: c.city};
 								$store.s.page = 'country';
-								location.hash = '#tpc';
+                                location.hash = '#tpc';
 								">
                                 <div class=" media-body" x-html="`${c.city} <p>${c.value}</p>`">
                                 </div>
@@ -210,10 +209,9 @@
 					if (item.displayname) {
                         console.log('clicked country', item);
                         loadCountry(item, items);
-                        $store.s.country = {id: item.id, n: item.n};
                     } else {
                         console.log('clicked city', item);
-                        $store.s.city = {id: item.id, n: item.n};
+                        $store.s.city = { id: item.id, n: item.n };
                         $store.s.page = 'country';
                         location.hash = '#tpc';
                     }

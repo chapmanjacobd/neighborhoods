@@ -577,7 +577,7 @@ function getColumn(items, column) {
         col: plural(renameCountryProperties(column), 2),
         country: x.c,
         city: x.n,
-        cityId: x.cityId,
+        id: x.cityId,
         n: x.n,
         u: x.u,
         v: x[column],
