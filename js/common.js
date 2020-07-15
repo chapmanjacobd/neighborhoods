@@ -590,7 +590,14 @@ function getColumn(items, column) {
 function niceSum(val) {
   if (!val) return val;
   if (val[1] == null) return val;
+  if (val[1].length > 1 && val[2].length > 1)
+    return Number(
+      Math.floor(val[1].reduce((s, c) => s + c) / val[1].length) +
+        "." +
+        Math.floor(val[2].reduce((s, c) => s + c) / val[2].length)
+    );
   if (val[1].length > 1) return val[1].reduce((s, c) => s + c) / val[1].length;
+  if (val[1] && val[2]) return Number(Math.floor(val[1]) + "." + Math.floor(val[2]));
   if (val[1]) return val[1];
   if (isIterable(val)) return Math.max(...val);
 
