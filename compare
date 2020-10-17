@@ -1,0 +1,10 @@
+search -> load cityid + displayname
+    click -> save cityid to $store.cities
+             load neighborhoods
+
+compare screen -> show each item with a different color
+
+neighborhood does not have id but we can use the index
+
+$store.d.all <- all neighborhood data
+$store.d.s <- selected neighborhoods

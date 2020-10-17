@@ -13,10 +13,12 @@ let defaultS = {
   column: {},
   country: {},
   city: {},
+  cities: [],
   neighborhood: {},
 };
 
 Spruce.store("s", {});
+Spruce.store("d", { all: [], s: [], search: [] });
 
 function JSONParse(text, reviver) {
   try {
@@ -196,9 +198,9 @@ function shadeColor(color, percent) {
   var G = parseInt(color.substring(3, 5), 16);
   var B = parseInt(color.substring(5, 7), 16);
 
-  R = parseInt((R * (100 + percent)) / 100);
-  G = parseInt((G * (100 + percent)) / 100);
-  B = parseInt((B * (100 + percent)) / 100);
+  R = (R * (100 + Number(percent))) / 100;
+  G = (G * (100 + Number(percent))) / 100;
+  B = (B * (100 + Number(percent))) / 100;
 
   R = R < 255 ? R : 255;
   G = G < 255 ? G : 255;

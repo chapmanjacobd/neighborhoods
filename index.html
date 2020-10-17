@@ -139,7 +139,7 @@
 						<template x-for="c of getColumn(items, $store.s.column) ">
 
 							<li class="table-view-cell media" @click="
-								$store.s.country = c.u; 
+								$store.s.country = c.u;
 								$store.s.page = 'country';
 								location.hash = '#tpc';
 								">
@@ -204,6 +204,10 @@
 		<a class="tab-item" href="./cities.html">
 			<span class="icon la la-city"></span>
 			<span class="tab-label">Cities</span>
+		</a>
+		<a class="tab-item" href="./compare.html">
+			<span class="icon la la-object-ungroup"></span>
+			<span class="tab-label">Compare</span>
 		</a>
 		<a class="tab-item" href="./neighborhoods.html">
 			<span class="icon la la-home"></span>

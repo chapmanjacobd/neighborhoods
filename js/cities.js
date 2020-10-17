@@ -58,3 +58,23 @@ function loadCountry(item, items) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   })();
 }
+
+function loadCity(item, items) {
+  document.getElementById("loading").classList.add("active");
+  (async function () {
+    try {
+      await fetch(`https://unli.xyz/neighbourhoods/api/getCities?k=${item.id}`)
+        .then((res) => res.json())
+        .then((res) => {
+          items.splice(0);
+          items.push(...res);
+          $store.s.city = { id: item.id, n: item.displayname };
+        });
+    } catch (err) {
+      console.log(err);
+    }
+
+    document.getElementById("loading").classList.remove("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  })();
+}
