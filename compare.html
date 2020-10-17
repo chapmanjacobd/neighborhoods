@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>UNLI Neighborhoods</title>
+    <title>UNLI Cities Compare</title>
     <!-- Sets initial viewport load and disables zooming  -->
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <meta name="description" content="Compare cities at the scale of neighborhoods">
@@ -20,23 +20,27 @@
         href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
     <!-- <script src="js/ratchet.js"></script> -->
 
-    <script src="https://cdn.jsdelivr.net/gh/ryangjchandler/spruce@0.6.1/dist/spruce.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.4.1/dist/alpine.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@0.x.x/dist/spruce.umd.js"></script>
+
     <script src="js/match-sorter.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.6.x/dist/alpine.min.js"></script>
     <script src="./js/common.js"></script>
-    <script src="./js/neighborhoods.js"></script>
+    <script src="./js/compare.js"></script>
+
 </head>
 
 <body>
 
     <header class="bar bar-nav">
         <a class="icon icon-left pull-left" href="./cities.html"></a>
-        <h1 class="title">UNLI Neighborhoods</h1>
+        <h1 class="title">UNLI Cities Compare</h1>
     </header>
 
     <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
         //fetch('/n.json').then(r => r.json()).then(r => $store.d.all = [{id: 0, n: 'search cities', neighborhoods: r}])
-        $store.s.cities && $store.s.cities.length > 0 ? loadNeighborhoodsMany() : $store.d.s = []
+        $store.s.cities && $store.s.cities.length > 0 ? loadNeighborhoodsMany() : ()=>{}
         " x-subscribe>
 
 
@@ -50,82 +54,127 @@
 
 
         <!-- Compare Page -->
-        <div x-show=" $store.s.page === 'country'; " class="modal active" style="width: 100vw; height: 100vh;">
-            <template x-for="item in $store.d.all" :key="item.id" x-show="$store.d.all.length != 0">
-                <div>
+        <div x-show="$store.s.page === 'compare'" class="modal active" style="width: 100vw; height: 100vh;">
 
-                    <header class="bar bar-nav">
-                        <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
-                        <h1 class="title" x-text="item.n">
-                        </h1>
-                    </header>
+            <header class="bar bar-nav">
+                <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
+                <h1 class="title">Comparison View
+                </h1>
+            </header>
 
-                    <div class="content">
+            <div class="content">
 
-                        <div id="tpC" class="content-padded">
+                <div id="tpC" class="content-padded">
 
-                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                <h1 x-text="resolve('n',  getCountry($store.d.all, $store.s.neighborhood))">
-                                </h1>
-                                <i src="flags/blank.gif"
-                                    :class="'flag flag-' + resolve('u',  getCountry($store.d.all, $store.s.neighborhood)).toLowerCase()"></i>
-                            </div>
+                    <ul class="table-view" style="overflow-y: auto;">
 
-                            <ul class="table-view" style="max-height: 8rem; overflow-y: auto;">
+                        <template x-for="(neighborhood, index) in $store.d.s" :key="index">
+                            <li>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <h6 x-text="resolve('n', neighborhood)">
+                                    </h6>
+                                    <i src="flags/blank.gif" :class="
+                                            'flag flag-' + resolve('u',  neighborhood).toLowerCase()
+                                            "></i>
+                                </div>
 
-                                <li class="table-view-cell navigate-right">
+                                <div class="table-view-cell navigate-right">
                                     <a target="_new"
-                                        :href="`https://www.google.com/maps/@${resolve('lat', getCountry($store.d.all, $store.s.neighborhood))},${resolve('lon',  getCountry($store.d.all, $store.s.neighborhood))},16z/`">
+                                        :href="`https://www.google.com/maps/@${neighborhood.lat},${neighborhood.lon},16z/`">
                                         <span class="icon la la-map"></span>
                                         View Map
-                                    </a></li>
+                                    </a>
+                                </div>
+                            </li>
+                        </template>
 
-                                <li class="table-view-cell navigate-right">
+                        <template x-for="(neighborhood, index) in $store.d.s" :key="index">
+                            <li>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <h6 x-text="resolve('n', neighborhood)">
+                                    </h6>
+                                    <i src="flags/blank.gif" :class="
+                                                                    'flag flag-' + resolve('u',  neighborhood).toLowerCase()
+                                                                    "></i>
+                                </div>
+
+                                <div class="table-view-cell navigate-right">
                                     <a target="_new"
-                                        :href="`https://youtube.com/search?q=${resolve('n',  getCountry($store.d.all, $store.s.neighborhood))}, ${resolve('s',  getCountry($store.d.all, $store.s.neighborhood))}`">
+                                        :href="`https://youtube.com/search?q=${resolve('n',  neighborhood)}, ${resolve('s',  neighborhood)}`">
                                         <span class="icon la la-youtube-square"></span>
                                         YouTube Search
-                                    </a></li>
+                                    </a>
+                                </div>
+                            </li>
+                        </template>
 
-                                <li class="table-view-cell navigate-right">
+
+                        <template x-for="(neighborhood, index) in $store.d.s" :key="index">
+                            <li>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <h6 x-text="resolve('n', neighborhood)">
+                                    </h6>
+                                    <i src="flags/blank.gif" :class="
+                                                                                            'flag flag-' + resolve('u',  neighborhood).toLowerCase()
+                                                                                            "></i>
+                                </div>
+
+                                <div class="table-view-cell navigate-right">
                                     <a target="_new"
-                                        :href="`https://google.com/search?q=${resolve('n',  getCountry($store.d.all, $store.s.neighborhood))}, ${resolve('s',  getCountry($store.d.all, $store.s.neighborhood))}`">
+                                        :href="`https://google.com/search?q=${resolve('n',  neighborhood)}, ${resolve('s',  neighborhood)}`">
                                         <span class="icon la la-google"></span>
                                         Google Search
-                                    </a></li>
+                                    </a>
+                                </div>
+
+                            </li>
+                        </template>
+
+                        <template x-for="column in Object.keys($store.d.s[0] || {})">
+                            <div>
 
 
+                                <h3 x-text="window.column = column"></h3>
+                                <template x-for="n in $store.d.s">
+                                    <div>
 
-
-                                <template x-for="c of countryDisplay(getCountry($store.d.all, $store.s.neighborhood))">
-                                    <li @click="
-									//$store.s.column = c.p;
-									//$store.s.page = 'column';
-									//location.hash = '#tpC';
-								" class="table-view-cell media">
-                                        <div class=" media-body" x-html="`${c.dp} <p>${c.v}</p>`">
+                                        <div
+                                            style="display: flex; justify-content: space-between; align-items: baseline;">
+                                            <h6 x-text="resolve('n', n)">
+                                            </h6>
+                                            <i src="flags/blank.gif"
+                                                :class=" 'flag flag-' + resolve('u',  n).toLowerCase()"></i>
                                         </div>
-                                    </li>
+
+
+                                        <li class="table-view-cell media">
+                                            <div class=" media-body"
+                                                x-html="`${getColumn([n], column).n} <p>${getColumn([n], column).value}</p>`">
+                                            </div>
+                                        </li>
+
+
+                                    </div>
                                 </template>
-
-                            </ul>
-
-                            <div class="">
-                                <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded"
-                                    @click="$store.s.page = 'l'">
-                                    Close
-                                </button>
                             </div>
 
-                        </div>
-                    </div>
+                        </template>
+
+
+
+
+                    </ul>
 
                 </div>
-            </template>
+
+                <div class="">
+                    <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded" @click="$store.s.page = 'l'">
+                        Close
+                    </button>
+                </div>
+
+            </div>
         </div>
-
-
-
 
 
 
@@ -135,9 +184,9 @@
             <input type="search"
                 :placeholder="$store.d.all.length == 0 ? 'Search Cities' : 'Filter Neighborhoods / Search Cities'"
                 style="margin-bottom: 5px;" x-model.debounce.150="filterString"
-                x-on:keydown.enter="searchCityMany(filterString);">
+                x-on:keydown.enter="searchCity(filterString);">
             <a class="icon icon-search pull-right" href="#" @click="
-            searchCityMany(filterString);
+            searchCity(filterString);
             " style="line-height: 1.5; padding: 0 0.3rem 0 0.6rem;"></a>
         </div>
 
@@ -146,14 +195,15 @@
         </div>
 
 
-        <template x-for="item in $store.d.all" :key="item.id" x-show="$store.d.all.length != 0">
+        <template x-for="city in $store.d.all" :key="city.id" x-show="$store.d.all.length != 0">
             <div>
 
                 <div class="content-padded" x-show="$store.d.all.length != 0">
                     <div style="display: flex; justify-content: space-between;">
-                        <p x-text="resolve('n',  item);console.log($store.d.all.length)"></p>
-                        <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded " x-show="item.id !== 0"
-                            @click="removeCity(item.id, $store.d.all)">
+                        <p x-text="resolve('n',  city);console.log($store.d.all.length)"></p>
+
+                        <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded " x-show="city.id !== 0"
+                            @click="removeCity(city.id)">
                             Remove City
                         </button>
                     </div>
@@ -162,20 +212,22 @@
                 <div class="card" style="margin-bottom: 5rem;">
                     <ul class="table-view" style="max-height: 8rem; overflow-y: auto;">
 
-                        <!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
-                        <template x-for="(nOrC, index) in filterItems(filterString,item.neighborhoods)" :key="nOrC.n">
+                        <template x-for="(cityStub, index) in filterItems(filterString, city.searchResults)"
+                            :key="cityStub.id">
 
-                            <li x-html="itemR(item.id, nOrC, index)" @click="
-                            if (nOrC.displayname) {
-                                // city
-                                console.log($store.d.all)
-                                loadNeighborhoods(nOrC, $store.d.all);
-                            } else {
-                                // neighborhood
-                                console.log($store.d.neighborhoods)
-                            }
+                            <li x-html="listCity(cityStub)" @click.debounce.500="
+                            await loadNeighborhoods(cityStub);
                             filterString = '';
                             " class="table-view-cell">
+                            </li>
+
+                        </template>
+
+                        <!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
+                        <template x-for="(neighborhood, index) in filterItems(filterString, city.neighborhoods)"
+                            :key="neighborhood.n">
+
+                            <li x-html="listNeighborhood(neighborhood, index)" class="table-view-cell">
                             </li>
 
                         </template>
@@ -185,10 +237,10 @@
             </div>
         </template>
 
-        <div style="display: flex;justify-content: center;">
-            <button class="content-padded" @click="$store.s.page = 'country';
-                        location.hash = '#tpc';
-                        ">Compare</button>
+        <div style="display: flex;justify-content: center; padding-bottom:6rem">
+            <button class="content-padded" @click="$store.s.page = 'compare';
+                    location.hash = '#tpc';
+                   ">Compare</button>
         </div>
 
 
