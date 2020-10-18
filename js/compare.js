@@ -1,13 +1,11 @@
-function searchCity(searchString) {
+function searchCity(searchString, items) {
   (async function () {
     try {
       await fetch(`https://unli.xyz/neighbourhoods/api/searchOrigin?input=${searchString}`)
         .then((res) => res.json())
         .then((res) => {
-          console.log($store.d.all);
-          console.log($store.d.s);
-          $store.d.all.splice($store.d.all.indexOf((x) => x.id === 0));
-          $store.d.all.push({
+          items.splice(items.indexOf((x) => x.id === 0));
+          items.push({
             id: 0,
             n: "Search cities",
             searchResults: res.map((x) => ({
@@ -27,15 +25,8 @@ function listCity(city) {
   console.log("listCity");
   return `
     <div>
-      <div>
-        <i src="flags/blank.gif" class="flag flag-${city.u.toLowerCase()}"></i>
-        ${city.n}
-      </div>
-      <div x-data="{ t: false, d: 'pull-right toggle' }">
-        <div :class="t ? d + ' active' : d" style="cursor: pointer;" @click="t=!t">
-          <div class="toggle-handle"></div>
-        </div>
-      </div>
+      <i src="flags/blank.gif" class="flag flag-${city.u.toLowerCase()}"></i>
+      ${city.n}
     </div>
   `;
 }
@@ -145,7 +136,9 @@ function debounce(fn, delay) {
 function comparePrintName(neighborhood) {
   return `
   <i src="flags/blank.gif" class="flag flag-${resolve("u", neighborhood).toLowerCase()}"></i>
-  <h6 style="padding-left:8px;">${resolve("city", neighborhood)}</h6>
+  <h6 style="padding-left:8px;">${
+    resolve("city", neighborhood) + " - " + resolve("n", neighborhood)
+  }</h6>
    `;
 }
 

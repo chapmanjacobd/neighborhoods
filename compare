@@ -8,3 +8,6 @@ neighborhood does not have id but we can use the index
 
 $store.d.all <- all neighborhood data
 $store.d.s <- selected neighborhoods
+
+remove match-sorter
+compare countries at the scale of cities
