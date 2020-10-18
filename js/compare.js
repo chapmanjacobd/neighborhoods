@@ -72,7 +72,7 @@ async function loadNeighborhoods(city) {
             n: city.displayname || city.n,
             neighborhoods: res.map((x) => ({ ...x, city: city.displayname, cityId: city.id })),
           });
-          $store.s.cities = [...$store.s.cities, city];
+          $store.s.cities = [...$store.s.cities, { id: city.id, displayname: city.displayname }];
         });
     } catch (err) {
       console.log(err);
@@ -144,19 +144,45 @@ function debounce(fn, delay) {
 
 function comparePrintName(neighborhood) {
   return `
-   <h6>${resolve("n", neighborhood) + " " + resolve("city", neighborhood)}</h6>
-   <i src="flags/blank.gif" class="flag flag-${resolve("u", neighborhood).toLowerCase()}"></i>
+  <i src="flags/blank.gif" class="flag flag-${resolve("u", neighborhood).toLowerCase()}"></i>
+  <h6 style="padding-left:8px;">${resolve("city", neighborhood)}</h6>
    `;
 }
 
 function compareEveryColumn() {
-  const hiddenKeys = ["n", "u", "s"];
+  const hiddenKeys = [
+    "n",
+    "u",
+    "s",
+    "lat",
+    "lon",
+    "noise",
+    "co_var",
+    "interesting_comp",
+    "boring_comp",
+    "safe_comp",
+    "danger_comp",
+    "osmn",
+    "popc",
+    "popc",
+    "navw",
+    "city",
+    "cityId",
+    "ppp",
+    "popd_sum",
+    "nightlights",
+    "glob_crop",
+    "glob_forest",
+    "glob_ve",
+    "glob_wet",
+    "glob_urban",
+  ];
   const keys = Object.keys($store.d.s[0] || {}).filter((str) => !hiddenKeys.includes(str));
 
   return keys
     .map((col) => {
       return `
-      <h3>${col}</h3>
+      <h3>${renameCountryProperties(col)}</h3>
     ${forEachNeighborhood(col)}
   `;
     })
@@ -168,7 +194,7 @@ function compareEveryColumn() {
       .map((n) => {
         return `
       <div>
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="display: flex; justify-content: center; align-items: baseline;">
           ${comparePrintName(n)}
         </div>
 

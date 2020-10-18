@@ -277,7 +277,7 @@ function renameCountryProperties(p) {
   if (p == "rain") return "Rainfall";
   if (p == "co_var") return "co var";
   if (p == "tmp") return "Temperature";
-  if (p == "srad") return "Sun";
+  if (p == "srad") return "Solar Radiation";
   if (p == "wind") return "Wind";
   if (p == "interesting") return "Interesting features";
   if (p == "boring") return "Boring features";
@@ -287,14 +287,14 @@ function renameCountryProperties(p) {
   if (p == "tourismcount") return "Tourism";
   if (p == "public_transport") return "Public transport";
   if (p == "slope_mean") return "Avg slope";
-  if (p == "popghs") return "Population (GHS)";
-  if (p == "osmpop") return "Population (OSM)";
+  if (p == "popghs") return "Estimated population within the neighborhood (GHS)";
+  if (p == "osmpop") return "Population of the city (OSM)";
   if (p == "built") return "Avg Built-up";
   if (p == "groads_count") return "# of Large roads";
   if (p == "groads_avg_length") return "Length of highways";
   if (p == "toilets") return "Public toilets";
   if (p == "food") return "<span class='icon la la-hamburger'></span> Restaurants";
-  if (p == "accessibility_to_city") return "Accessibility to city";
+  if (p == "accessibility_to_city") return "Accessibility to city (lower is better)";
   if (p == "glob_urban_min") return "glob urban min";
   if (p == "glob_urban_avg") return "glob urban avg";
   if (p == "glob_urban_max") return "glob urban max";
@@ -316,14 +316,14 @@ function renameCountryProperties(p) {
   if (p == "danger_comp") return "danger comp";
   if (p == "slope") return "Slope";
   if (p == "elevation") return "Elevation";
-  if (p == "osmpopulation_avg") return "Population (OSM)";
+  if (p == "osmpopulation_avg") return "Avg population of nearby cities (OSM)";
   if (p == "built_env") return "Built-up";
   if (p == "osmn") return "osmn";
   if (p == "popc") return "popc";
   if (p == "popd_sum") return "popd sum";
   if (p == "ppp") return "ppp";
   if (p == "nightlights") return "nightlights";
-  if (p == "groads") return "groads";
+  if (p == "groads") return "Highways";
   if (p == "glob_crop") return "glob croplands";
   if (p == "glob_forest") return "glob forest";
   if (p == "glob_ve") return "glob vegetation";
@@ -405,8 +405,8 @@ function renameCountryValues(p, v) {
     function getMaximum() {
       if (p == "public_transport") return 20;
       if (p == "co_var") return 80000;
-      if (p == "interesting") return 400;
-      if (p == "boring") return 300;
+      if (p == "interesting") return 3000;
+      if (p == "boring") return 4000;
       if (p == "safety") return 4000;
       if (p == "danger") return 800;
       if (p == "coastline") return 100;
@@ -415,6 +415,7 @@ function renameCountryValues(p, v) {
       if (p == "popghs") return 60410;
       if (p == "osmpop") return 3029485;
       if (p == "built") return 1242571;
+      if (p == "groads") return 5;
       if (p == "groads_count") return 30;
       if (p == "groads_avg_length") return 50;
       if (p == "toilets") return 30;
@@ -462,12 +463,13 @@ function renameCountryValues(p, v) {
       if (p == "slope_mean") return 20545;
       if (p == "popghs") return 60410;
       if (p == "osmpop") return 3029485;
+      if (p == "osmpopulation_avg") return 3029485;
       if (p == "built") return 1242571;
       if (p == "groads_count") return 30;
       if (p == "groads_avg_length") return 120;
       if (p == "toilets") return 80;
       if (p == "food") return 100;
-      if (p == "accessibility_to_city") return 1742;
+      if (p == "accessibility_to_city") return 100;
       if (p == "glob_urban_min") return 0;
       if (p == "glob_urban_avg") return 25;
       if (p == "glob_urban_max") return 142;
