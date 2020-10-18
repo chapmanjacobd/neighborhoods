@@ -77,10 +77,8 @@ async function loadNeighborhoods(city) {
     } catch (err) {
       console.log(err);
     }
+    document.getElementById("loading").classList.remove("active");
   }
-
-  document.getElementById("loading").classList.remove("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function loadNeighborhoodsMany() {
@@ -97,14 +95,14 @@ async function loadNeighborhoodsMany() {
 }
 
 function listNeighborhood(neighborhood, index) {
-  if (index == 1) console.log("listNeighborhood", neighborhood.cityId, neighborhood.n);
+  if (index == 0) console.log("listNeighborhood", neighborhood.cityId, neighborhood.n);
   return `
     <div>
       <div>
         <i src="flags/blank.gif" class="flag flag-${neighborhood.u.toLowerCase()}"></i>
         ${neighborhood.n}
       </div>
-      <div x-data="{ t: ${autoSelectNeighborhoods()}, d: 'pull-right toggle' }">
+      <div x-data="{ t: false, d: 'pull-right toggle' }">
         <div :class="t ? d + ' active' : d" style="cursor: pointer;" @click.debounce.500="t=!t;
         t ? addNeighborhood(${neighborhood.cityId}, ${index})
           : removeNeighborhood('${neighborhood.n}')
@@ -114,14 +112,6 @@ function listNeighborhood(neighborhood, index) {
       </div>
     </div>
   `;
-
-  function autoSelectNeighborhoods() {
-    if (index < 10 && Math.random() >= 0.75) {
-      addNeighborhood(neighborhood.cityId, index);
-      return "true";
-    }
-    return "false";
-  }
 }
 
 /**
@@ -150,4 +140,46 @@ function debounce(fn, delay) {
       fn.apply(context, args);
     }, delay);
   };
+}
+
+function comparePrintName(neighborhood) {
+  return `
+   <h6>${resolve("n", neighborhood) + " " + resolve("city", neighborhood)}</h6>
+   <i src="flags/blank.gif" class="flag flag-${resolve("u", neighborhood).toLowerCase()}"></i>
+   `;
+}
+
+function compareEveryColumn() {
+  const hiddenKeys = ["n", "u", "s"];
+  const keys = Object.keys($store.d.s[0] || {}).filter((str) => !hiddenKeys.includes(str));
+
+  return keys
+    .map((col) => {
+      return `
+      <h3>${col}</h3>
+    ${forEachNeighborhood(col)}
+  `;
+    })
+    .join(" ");
+
+  function forEachNeighborhood(col) {
+    const neighborhoods = $store.d.s;
+    return neighborhoods
+      .map((n) => {
+        return `
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          ${comparePrintName(n)}
+        </div>
+
+        <li class="table-view-cell media">
+          <div class=" media-body">
+            ${getColumn([n], col)[0].n}
+            <p>${getColumn([n], col)[0].value}</p>
+          </div>
+        </li>
+      </div>`;
+      })
+      .join(" ");
+  }
 }

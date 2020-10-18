@@ -70,13 +70,8 @@
 
                         <template x-for="(neighborhood, index) in $store.d.s" :key="index">
                             <li>
-                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                    <h6 x-text="resolve('n', neighborhood)">
-                                    </h6>
-                                    <i src="flags/blank.gif" :class="
-                                            'flag flag-' + resolve('u',  neighborhood).toLowerCase()
-                                            "></i>
-                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;"
+                                    x-html="comparePrintName(neighborhood)"></div>
 
                                 <div class="table-view-cell navigate-right">
                                     <a target="_new"
@@ -90,13 +85,8 @@
 
                         <template x-for="(neighborhood, index) in $store.d.s" :key="index">
                             <li>
-                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                    <h6 x-text="resolve('n', neighborhood)">
-                                    </h6>
-                                    <i src="flags/blank.gif" :class="
-                                                                    'flag flag-' + resolve('u',  neighborhood).toLowerCase()
-                                                                    "></i>
-                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;"
+                                    x-html="comparePrintName(neighborhood)"></div>
 
                                 <div class="table-view-cell navigate-right">
                                     <a target="_new"
@@ -111,13 +101,8 @@
 
                         <template x-for="(neighborhood, index) in $store.d.s" :key="index">
                             <li>
-                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                    <h6 x-text="resolve('n', neighborhood)">
-                                    </h6>
-                                    <i src="flags/blank.gif" :class="
-                                                                                            'flag flag-' + resolve('u',  neighborhood).toLowerCase()
-                                                                                            "></i>
-                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;"
+                                    x-html="comparePrintName(neighborhood)"></div>
 
                                 <div class="table-view-cell navigate-right">
                                     <a target="_new"
@@ -130,38 +115,7 @@
                             </li>
                         </template>
 
-                        <template x-for="column in Object.keys($store.d.s[0] || {})">
-                            <div>
-
-
-                                <h3 x-text="window.column = column"></h3>
-                                <template x-for="n in $store.d.s">
-                                    <div>
-
-                                        <div
-                                            style="display: flex; justify-content: space-between; align-items: baseline;">
-                                            <h6 x-text="resolve('n', n)">
-                                            </h6>
-                                            <i src="flags/blank.gif"
-                                                :class=" 'flag flag-' + resolve('u',  n).toLowerCase()"></i>
-                                        </div>
-
-
-                                        <li class="table-view-cell media">
-                                            <div class=" media-body"
-                                                x-html="`${getColumn([n], column).n} <p>${getColumn([n], column).value}</p>`">
-                                            </div>
-                                        </li>
-
-
-                                    </div>
-                                </template>
-                            </div>
-
-                        </template>
-
-
-
+                        <div x-html="compareEveryColumn()"></div>
 
                     </ul>
 
