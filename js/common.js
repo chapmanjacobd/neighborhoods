@@ -39,7 +39,7 @@ if (typeof gotSFromURL === "undefined") {
     if (urlParams.has(key)) {
       var sParam = JSONParse(urlParams.get(key));
 
-      if (sParam != null) {
+      if (sParam != null && sParam != "page") {
         Object.assign(sFromURL, { [key]: sParam });
       }
     } else {
@@ -294,7 +294,7 @@ function renameCountryProperties(p) {
   if (p == "groads_avg_length") return "Length of highways";
   if (p == "toilets") return "Public toilets";
   if (p == "food") return "<span class='icon la la-hamburger'></span> Restaurants";
-  if (p == "accessibility_to_city") return "Accessibility to city (lower is better)";
+  if (p == "accessibility_to_city") return "Accessibility to city";
   if (p == "glob_urban_min") return "glob urban min";
   if (p == "glob_urban_avg") return "glob urban avg";
   if (p == "glob_urban_max") return "glob urban max";
@@ -385,6 +385,7 @@ function renameCountryValues(p, v) {
   if (p == "dist") return Math.floor(v / 1000) + " km";
   if (p == "noise") return v + " (dB)";
   if (p == "food") return singleValueChart(p, v);
+  if (p == "accessibility_to_city") return singleValueChart(p, Math.floor((2 / v) * 100));
   if (typeof v == "number") return singleValueChart(p, v);
 
   return v;
@@ -411,6 +412,7 @@ function renameCountryValues(p, v) {
       if (p == "danger") return 800;
       if (p == "coastline") return 100;
       if (p == "tourismcount") return 8000;
+      if (p == "accessibility_to_city") return 100;
       if (p == "slope_mean") return 20545;
       if (p == "popghs") return 60410;
       if (p == "osmpop") return 3029485;
@@ -469,7 +471,6 @@ function renameCountryValues(p, v) {
       if (p == "groads_avg_length") return 120;
       if (p == "toilets") return 80;
       if (p == "food") return 100;
-      if (p == "accessibility_to_city") return 100;
       if (p == "glob_urban_min") return 0;
       if (p == "glob_urban_avg") return 25;
       if (p == "glob_urban_max") return 142;
@@ -569,7 +570,7 @@ function renameCountryValues(p, v) {
 }
 
 function getData() {
-  return { items: [], filterString: "", s: {} };
+  return { items: [], filterString: "", s: [], all: [] };
 }
 
 function getColumn(items, column) {

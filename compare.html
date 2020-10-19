@@ -2,209 +2,214 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>UNLI Cities Compare</title>
-    <!-- Sets initial viewport load and disables zooming  -->
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-    <meta name="description" content="Compare cities at the scale of neighborhoods">
-    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta charset="utf-8">
+  <title>UNLI Cities Compare</title>
+  <!-- Sets initial viewport load and disables zooming  -->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Compare cities at the scale of neighborhoods">
+  <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-    <link href="css/ratchet.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/charts.css">
-    <link rel="stylesheet" href="flags/flags.min.css">
-    <!-- <link href="css/ratchet-theme-android.css" rel="stylesheet"> -->
-    <link href="css/ratchet-theme-ios.css" rel="stylesheet">
-    <link rel="stylesheet"
-        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
-    <!-- <script src="js/ratchet.js"></script> -->
+  <link href="css/ratchet.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/charts.css">
+  <link rel="stylesheet" href="flags/flags.min.css">
+  <!-- <link href="css/ratchet-theme-android.css" rel="stylesheet"> -->
+  <link href="css/ratchet-theme-ios.css" rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+  <!-- <script src="js/ratchet.js"></script> -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@0.x.x/dist/spruce.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@0.x.x/dist/spruce.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/alpine-collective/alpine-magic-helpers@0.3.x/dist/component.js"></script>
+  <script src="js/match-sorter.js"></script>
 
-    <script src="js/match-sorter.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
-    <script src="./js/common.js"></script>
-    <script src="./js/compare.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/compare.js"></script>
 
 </head>
 
 <body>
 
-    <header class="bar bar-nav">
-        <a class="icon icon-left pull-left" href="./cities.html"></a>
-        <h1 class="title">UNLI Cities Compare</h1>
-    </header>
+  <header class="bar bar-nav">
+    <a class="icon icon-left pull-left" href="./cities.html"></a>
+    <h1 class="title">UNLI Cities Compare</h1>
+  </header>
 
-    <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
+  <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
         //fetch('/n.json').then(r => r.json()).then(r => $store.d.all = [{id: 0, n: 'search cities', neighborhoods: r}])
         $store.s.cities && $store.s.cities.length > 0 && $store.d.all.length == 0 ? loadNeighborhoodsMany() : ()=>{}
-        " x-subscribe>
+        " x-subscribe id='selectCitiesAndNeighborhoods'>
 
 
-        <div id="loading" class="modal ">
-            <header class="bar bar-nav">
-                <h1 class="title">Loading</h1>
-            </header>
+    <div id="loading" class="modal ">
+      <header class="bar bar-nav">
+        <h1 class="title">Loading</h1>
+      </header>
 
-            <span class="icon la la-spinner center spin" style=""></span>
-        </div>
-
-
-        <!-- Compare Page -->
-        <div x-show="$store.s.page === 'compare'" class="modal active" style="width: 100vw; height: 100vh;">
-
-            <header class="bar bar-nav">
-                <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
-                <h1 class="title">Comparison View
-                </h1>
-            </header>
-
-            <div class="content">
-
-                <div id="tpC" class="content-padded">
-
-                    <ul class="table-view" style="overflow-y: auto;">
+      <span class="icon la la-spinner center spin" style=""></span>
+    </div>
 
 
-                        <template x-for="(neighborhood, index) in $store.d.s" :key="index">
-                            <li>
-                                <div style="display: flex; justify-content: center; align-items: baseline;"
-                                    x-html="comparePrintName(neighborhood)"></div>
+    <!-- Compare Page -->
+    <div x-show="$store.s.page === 'compare'" class="modal active" style="width: 100vw; height: 100vh;">
 
-                                <div class="table-view-cell navigate-right">
-                                    <a target="_new"
-                                        :href="`https://www.google.com/maps/@${neighborhood.lat},${neighborhood.lon},16z/`">
-                                        <span class="icon la la-map"></span>
-                                        View Map
-                                    </a>
-                                </div>
+      <header class="bar bar-nav">
+        <a class="icon icon-close pull-right" href="#" @click="$store.s.page = 'l'"></a>
+        <h1 class="title">Comparison View
+        </h1>
+      </header>
 
-                                <div class="table-view-cell navigate-right">
-                                    <a target="_new"
-                                        :href="`https://youtube.com/search?q=${resolve('n',  neighborhood)}, ${resolve('s',  neighborhood)}`">
-                                        <span class="icon la la-youtube-square"></span>
-                                        YouTube Search
-                                    </a>
-                                </div>
+      <div class="content">
 
-                                <div class="table-view-cell navigate-right">
-                                    <a target="_new"
-                                        :href="`https://google.com/search?q=${resolve('n',  neighborhood)}, ${resolve('s',  neighborhood)}`">
-                                        <span class="icon la la-google"></span>
-                                        Google Search
-                                    </a>
-                                </div>
-                            </li>
+        <div id="tpC" class="content-padded">
 
-                        </template>
+          <ul class="table-view" style="overflow-y: auto;">
 
-                        <div x-html="compareEveryColumn()"></div>
-
-                    </ul>
-
-                </div>
-
-                <div class="">
-                    <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded" @click="$store.s.page = 'l'">
-                        Close
-                    </button>
-                </div>
-
+            <div class="content-padded" x-show="$store.d.s.length == 0">
+              <h2 style="display: flex;justify-content: center;">🎑 choose a neighborhood first 👻</h2>
             </div>
-        </div>
 
-
-
-
-        <!-- Initial Page -->
-        <div class="content-padded" style="display: flex;">
-            <input type="search"
-                :placeholder="$store.d.all.length == 0 ? 'Search Cities' : 'Filter Neighborhoods / Search Cities'"
-                style="margin-bottom: 5px;" x-model.debounce.150="filterString"
-                x-on:keydown.enter="searchCity(filterString, $store.d.all); ">
-            <a class="icon icon-search pull-right" href="#" @click="
-            searchCity(filterString, $store.d.all);
-            " style="line-height: 1.5; padding: 0 0.3rem 0 0.6rem;"></a>
-        </div>
-
-        <div class="content-padded" x-show="$store.d.all.length == 0">
-            <p>No data loaded. Search for and select a city.</p>
-        </div>
-
-
-        <template x-for="city in $store.d.all;console.log($store.d.all.length)" :key="city.id">
-            <div>
-
-                <div class="content-padded">
-                    <div style="display: flex; justify-content: space-between;">
-                        <p x-text="resolve('n',  city)"></p>
-
-                        <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded " x-show="city.id !== 0"
-                            @click="removeCity(city.id)">
-                            Remove City
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card" style="margin-bottom: 5rem;">
-                    <ul class="table-view" style="max-height: 8rem; overflow-y: auto;">
-
-                        <template x-for="(cityStub, index) in filterItems(filterString, city.searchResults)"
-                            :key="cityStub.id">
-
-                            <li x-html="listCity(cityStub)" @click.debounce.500="
-                            await loadNeighborhoods(cityStub);
-                            filterString = '';
-                            " class="table-view-cell">
-                            </li>
-
-                        </template>
-
-                        <!-- https://unli.xyz/neighbourhoods/api/getCities?k=TW -->
-                        <template x-for="(neighborhood, index) in filterItems(filterString, city.neighborhoods)"
-                            :key="neighborhood.n">
-
-                            <li x-html="listNeighborhood(neighborhood, index)" class="table-view-cell">
-                            </li>
-
-                        </template>
-                    </ul>
-                </div>
-
+            <div x-show="$store.d.s.length > 0">
+              <h3 style="display: flex;justify-content: center;">Overview</h3>
             </div>
-        </template>
 
-        <div style="display: flex;justify-content: center; padding-bottom:6rem">
-            <button class="content-padded" @click="$store.s.page = 'compare';
-                    location.hash = '#tpc';
-                   ">Compare</button>
+            <template x-for="(neighborhood, index) in $store.d.s" :key="index">
+              <li>
+                <div style="display: flex; align-items: baseline;" x-html="comparePrintName(neighborhood)"></div>
+
+                <div class="table-view-cell navigate-right">
+                  <a target="_new" :href="`https://www.google.com/maps/@${neighborhood.lat},${neighborhood.lon},16z/`">
+                    <span class="icon la la-map"></span>
+                    View Map
+                  </a>
+                </div>
+
+                <div class="table-view-cell navigate-right">
+                  <a target="_new"
+                    :href="`https://youtube.com/search?q=${resolve('n',  neighborhood)}, ${resolve('s',  neighborhood)}`">
+                    <span class="icon la la-youtube-square"></span>
+                    YouTube Search
+                  </a>
+                </div>
+
+                <div class="table-view-cell navigate-right">
+                  <a target="_new"
+                    :href="`https://google.com/search?q=${resolve('n',  neighborhood)}, ${resolve('s',  neighborhood)}`">
+                    <span class="icon la la-google"></span>
+                    Google Search
+                  </a>
+                </div>
+              </li>
+
+            </template>
+
+            <div x-html="compareEveryColumn(s)"></div>
+
+          </ul>
+
         </div>
 
+        <div class="">
+          <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded" @click="$store.s.page = 'l'">
+            Close
+          </button>
+        </div>
 
+      </div>
     </div>
 
 
 
-    <nav class="bar bar-tab" style="bottom: 0; top: unset;">
-        <a class="tab-item " href="./">
-            <span class="icon la la-globe"></span>
-            <span class="tab-label">Countries</span>
-        </a>
-        <a class="tab-item " href="./cities.html">
-            <span class="icon la la-city"></span>
-            <span class="tab-label">Cities</span>
-        </a>
-        <a class="tab-item active" href="./compare.html">
-            <span class="icon la la-object-ungroup"></span>
-            <span class="tab-label">Compare</span>
-        </a>
-        <a class="tab-item" href="./neighborhoods.html">
-            <span class="icon la la-home"></span>
-            <span class="tab-label">Neighborhoods</span>
-        </a>
-    </nav>
+
+    <!-- Initial Page -->
+    <div class="content-padded" style="display: flex;">
+      <input type="search"
+        :placeholder="$store.d.all.length == 0 ? 'Search Cities' : 'Filter Neighborhoods / Search Cities'"
+        style="margin-bottom: 5px;" x-model.debounce.150="filterString"
+        x-on:keydown.enter="searchCity(filterString, $store.d.all); ">
+      <a class="icon icon-search pull-right" href="#" @click="
+            searchCity(filterString, $store.d.all);
+            " style="line-height: 1.5; padding: 0 0.3rem 0 0.6rem;"></a>
+    </div>
+
+    <div class="content-padded" x-show="$store.d.all.length == 0">
+      <p>No data loaded. Search for and select a city.</p>
+    </div>
+
+
+    <template x-for="city in $store.d.all;console.log($store.d.all.length)" :key="city.id">
+      <div>
+
+        <div class="content-padded">
+          <div style="display: flex; justify-content: space-between;">
+            <p x-text="resolve('n',  city)"></p>
+
+            <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded " x-show="city.id !== 0"
+              @click="removeCity(city.id)">
+              Remove City
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 5rem;">
+          <ul class="table-view" style="max-height: 14rem; overflow-y: auto;">
+
+            <template x-for="(cityStub, index, collection) in filterItems(filterString, city.searchResults)"
+              :key="cityStub.id">
+
+              <li x-html="listCity(cityStub)" @click.debounce.500="
+                await loadNeighborhoods(cityStub);
+                filterString = '';
+                $el.__x.updateElements($el);
+                " class="table-view-cell">
+              </li>
+
+            </template>
+
+            <template x-for="(neighborhood, index) in filterItems(filterString, city.neighborhoods)"
+              :key="neighborhood.n">
+
+              <li x-html="listNeighborhood(neighborhood, index)" class="table-view-cell">
+              </li>
+
+            </template>
+          </ul>
+        </div>
+
+      </div>
+    </template>
+
+    <div style="display: flex;justify-content: center; padding-bottom:6rem">
+      <button class="content-padded" @click="$store.s.page = 'compare';
+                    location.hash = '#tpc';
+                   ">Compare</button>
+    </div>
+
+
+  </div>
+
+
+
+  <nav class="bar bar-tab" style="bottom: 0; top: unset;">
+    <a class="tab-item " href="./">
+      <span class="icon la la-globe"></span>
+      <span class="tab-label">Countries</span>
+    </a>
+    <a class="tab-item " href="./cities.html">
+      <span class="icon la la-city"></span>
+      <span class="tab-label">Cities</span>
+    </a>
+    <a class="tab-item active" href="./compare.html">
+      <span class="icon la la-object-ungroup"></span>
+      <span class="tab-label">Compare</span>
+    </a>
+    <a class="tab-item" href="./neighborhoods.html">
+      <span class="icon la la-home"></span>
+      <span class="tab-label">Neighborhoods</span>
+    </a>
+  </nav>
 
 </body>
 

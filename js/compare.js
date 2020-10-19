@@ -5,7 +5,7 @@ function searchCity(searchString, items) {
         .then((res) => res.json())
         .then((res) => {
           items.splice(items.indexOf((x) => x.id === 0));
-          items.push({
+          items.unshift({
             id: 0,
             n: "Search cities",
             searchResults: res.map((x) => ({
@@ -14,6 +14,9 @@ function searchCity(searchString, items) {
               u: x.displayname.substring(x.displayname.length - 3).slice(0, -1),
             })),
           });
+
+          const el = document.querySelector("#selectCitiesAndNeighborhoods");
+          el.__x.updateElements(el);
         });
     } catch (err) {
       console.log(err);
@@ -24,7 +27,7 @@ function searchCity(searchString, items) {
 function listCity(city) {
   console.log("listCity");
   return `
-    <div>
+    <div style="cursor: pointer;">
       <i src="flags/blank.gif" class="flag flag-${city.u.toLowerCase()}"></i>
       ${city.n}
     </div>
@@ -33,19 +36,19 @@ function listCity(city) {
 
 function removeCity(cityId) {
   try {
-    $store.d.all = $store.d.all.filter((x) => x.id !== cityId);
-    $store.s.cities = $store.s.cities.filter((x) => x.id !== cityId);
+    this.$store.d.all = this.$store.d.all.filter((x) => x.id !== cityId);
+    this.$store.s.cities = this.$store.s.cities.filter((x) => x.id !== cityId);
   } catch (err) {
     console.log(err);
   }
 }
 
 function filterItems(filterString, items = []) {
-  if (!filterString) return items;
+  if (!filterString) return items.slice(0, 20);
 
   return matchSorter(items, filterString, {
     keys: ["n", "s", "u", "name"],
-  });
+  }).slice(0, 20);
 }
 
 /**
@@ -53,17 +56,31 @@ function filterItems(filterString, items = []) {
  */
 async function loadNeighborhoods(city) {
   document.getElementById("loading").classList.add("active");
-  if (!$store.d.all.find((x) => x.id === city.id)) {
+  if (!this.$store.d.all.find((x) => x.id === city.id)) {
     try {
       await fetch(`https://unli.xyz/neighbourhoods/api/getNeighborhoods?k=${city.id}`)
         .then((res) => res.json())
         .then((res) => {
-          $store.d.all.push({
+          this.$store.d.all.push({
             id: city.id,
             n: city.displayname || city.n,
             neighborhoods: res.map((x) => ({ ...x, city: city.displayname, cityId: city.id })),
           });
-          $store.s.cities = [...$store.s.cities, { id: city.id, displayname: city.displayname }];
+          this.$store.s.cities = [
+            ...this.$store.s.cities,
+            { id: city.id, displayname: city.displayname },
+          ];
+
+          // remove duplicate cities
+          const result = [];
+          const map = new Map();
+          for (const item of this.$store.s.cities) {
+            if (!map.has(item.id)) {
+              map.set(item.id, true); // set any value to Map
+              result.push(item);
+            }
+          }
+          this.$store.s.cities = result;
         });
     } catch (err) {
       console.log(err);
@@ -75,8 +92,7 @@ async function loadNeighborhoods(city) {
 async function loadNeighborhoodsMany() {
   document.getElementById("loading").classList.add("active");
 
-  // this will probably cause weird concurrency bugs
-  for await (const city of $store.s.cities) {
+  for await (const city of this.$store.s.cities) {
     console.log("loadNeighborhoodsMany", city);
     await loadNeighborhoods(city);
   }
@@ -93,11 +109,14 @@ function listNeighborhood(neighborhood, index) {
         <i src="flags/blank.gif" class="flag flag-${neighborhood.u.toLowerCase()}"></i>
         ${neighborhood.n}
       </div>
-      <div x-data="{ t: false, d: 'pull-right toggle' }">
-        <div :class="t ? d + ' active' : d" style="cursor: pointer;" @click.debounce.500="t=!t;
-        t ? addNeighborhood(${neighborhood.cityId}, ${index})
+      <div>
+        <div :class="t ? d + ' active' : d" style="cursor: pointer;"
+        x-data="{ t: false, d: 'pull-right toggle' }"
+        @click.debounce.200="
+        t=!t;
+          t ? addNeighborhood(${neighborhood.cityId}, ${index})
           : removeNeighborhood('${neighborhood.n}')
-          ">
+        ">
           <div class="toggle-handle"></div>
         </div>
       </div>
@@ -111,15 +130,16 @@ function listNeighborhood(neighborhood, index) {
  */
 function addNeighborhood(cityId, index) {
   console.log("addNeighborhood", cityId, index);
-  const city = $store.d.all.find((x) => x.id == cityId);
+  const city = this.$store.d.all.find((x) => x.id == cityId);
   const n = city.neighborhoods[index];
-  $store.d.s.push(n);
+  this.$store.d.s.push(n);
+  this.$store.d.s.sort((a, b) => b.interesting - a.interesting);
 }
 
 function removeNeighborhood(n) {
   console.log("removed", n);
 
-  $store.d.s.splice($store.d.s.indexOf((x) => x.n === n));
+  this.$store.d.s.splice(this.$store.d.s.indexOf((x) => x.n === n));
 }
 
 function debounce(fn, delay) {
@@ -133,12 +153,15 @@ function debounce(fn, delay) {
   };
 }
 
+/**
+ * @param {string} neighborhood
+ */
 function comparePrintName(neighborhood) {
   return `
   <i src="flags/blank.gif" class="flag flag-${resolve("u", neighborhood).toLowerCase()}"></i>
-  <h6 style="padding-left:8px;">${
+  <h5 style="padding-left:8px;">${
     resolve("city", neighborhood) + " - " + resolve("n", neighborhood)
-  }</h6>
+  }</h5>
    `;
 }
 
@@ -162,7 +185,7 @@ function compareEveryColumn() {
     "city",
     "cityId",
     "ppp",
-    "popd_sum",
+    "popd",
     "nightlights",
     "glob_crop",
     "glob_forest",
@@ -170,31 +193,43 @@ function compareEveryColumn() {
     "glob_wet",
     "glob_urban",
   ];
-  const keys = Object.keys($store.d.s[0] || {}).filter((str) => !hiddenKeys.includes(str));
+  const priority = [
+    "interesting",
+    "boring",
+    "danger",
+    "safety",
+    "food",
+    "public_transport",
+    "tourism",
+  ].reverse();
+
+  const keys = Object.keys(this.$store.d.s[0] || {})
+    .filter((str) => !hiddenKeys.includes(str))
+    .sort((a, b) => priority.indexOf(b) - priority.indexOf(a));
 
   return keys
     .map((col) => {
       return `
-      <h3>${renameCountryProperties(col)}</h3>
+      <h3 style="display: flex;justify-content: center;">
+        ${renameCountryProperties(col)}
+      </h3>
     ${forEachNeighborhood(col)}
   `;
     })
     .join(" ");
 
   function forEachNeighborhood(col) {
-    const neighborhoods = $store.d.s;
-    return neighborhoods
+    return this.$store.d.s
       .map((n) => {
         return `
       <div>
-        <div style="display: flex; justify-content: center; align-items: baseline;">
+        <div style="display: flex; align-items: baseline;">
           ${comparePrintName(n)}
         </div>
 
         <li class="table-view-cell media">
           <div class=" media-body">
-            ${getColumn([n], col)[0].n}
-            <p>${getColumn([n], col)[0].value}</p>
+            <p>${getColumn([n], col)[0].value || "No data found"}</p>
           </div>
         </li>
       </div>`;
