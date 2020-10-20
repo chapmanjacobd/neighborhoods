@@ -43,7 +43,7 @@ async function loadNeighborhoods(country) {
       console.log(err);
     }
     document.getElementById("loading").classList.remove("active");
-    setTimeout(() => (location.href = `#${country.u}`), 500);
+    setTimeout(() => (location.href = `#${country.u}`), 50);
   }
 }
 
@@ -193,9 +193,19 @@ function compareEveryColumn() {
   return keys
     .map((col) => {
       return `
-      <h3 style="display: flex;justify-content: center;">
-        ${renameCountryProperties(col)}
-      </h3>
+      <h3 style="display: flex;justify-content: center;">${renameCountryProperties(col)}</h3>
+      ${
+        col == "interesting"
+          ? `<div class="content-padded">
+              <p>
+                We use geospatial data to summarize places. For example, what is the minimum number of interesting
+                places within any neighborhood in a city? How many interesting places does the most interesting
+                neighborhood have? The idea relates to both density and variation in neighborhoods within city
+                boundaries.
+              </p>
+            </div>`
+          : ""
+      }
     ${forEachNeighborhood(col)}
   `;
     })
@@ -206,7 +216,7 @@ function compareEveryColumn() {
       .map((n) => {
         return `
       <div>
-        <div style="display: flex; align-items: baseline;">
+        <div style="display: flex; align-items: baseline;" class="content-padded" >
           ${comparePrintName(n)}
         </div>
 

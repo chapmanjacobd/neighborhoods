@@ -71,12 +71,13 @@
             </div>
 
             <div x-show="$store.d.s.length > 0">
-              <h3 style="display: flex;justify-content: center;">Overview</h3>
+              <h3 style="display: flex;justify-content: center;margin-top: 2rem;">Overview</h3>
             </div>
 
             <template x-for="(neighborhood, index) in $store.d.s" :key="index">
               <li>
-                <div style="display: flex; align-items: baseline;" x-html="comparePrintName(neighborhood)"></div>
+                <div class="content-padded" style="display: flex; align-items: baseline;"
+                  x-html="comparePrintName(neighborhood)"></div>
 
                 <div class="table-view-cell navigate-right">
                   <a target="_new" :href="`https://www.google.com/maps/@${neighborhood.lat},${neighborhood.lon},16z/`">

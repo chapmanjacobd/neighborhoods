@@ -446,8 +446,8 @@ function renameCountryValues(p, v) {
 
     return `
       <div style="display:flex; justify-content: space-between;">
-        <p>${(v[1] || 0).toLocaleString()}</p>
-        <p>${(v[2] || 0).toLocaleString()}</p>
+        <p>Min ${(v[1] || 0).toLocaleString()}</p>
+        <p>Max ${(v[2] || 0).toLocaleString()}</p>
       </div>
       <div style="display: -webkit-box;">
         <div class="chart" style="width: ${midP[0]}%;"></div>
