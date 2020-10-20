@@ -43,38 +43,43 @@ async function loadNeighborhoods(country) {
       console.log(err);
     }
     document.getElementById("loading").classList.remove("active");
+    setTimeout(() => (location.href = `#${country.u}`), 500);
   }
 }
 
-function listNeighborhood(city, index) {
-  if (index == 0) console.log("listNeighborhood", city.u, city.n);
+function listNeighborhood(city) {
   return `
-    <div>
+    <div
+      style="display: flex; justify-content: space-between;align-items: center;"
+    >
       <div>
         <i src="flags/blank.gif" class="flag flag-${city.u.toLowerCase()}"></i>
         ${city.n}
       </div>
-      <div>
-        <div :class="t ? d + ' active' : d" style="cursor: pointer;"
+      <div
+        :class="t ? d + ' active' : d"
+        style="cursor: pointer;"
         x-data="{ t: false, d: 'pull-right toggle' }"
         @click.debounce.200="
         t=!t;
-          t ? addNeighborhood('${city.u}', ${index})
-          : removeNeighborhood('${city.n}')
-        ">
-          <div class="toggle-handle"></div>
-        </div>
+          t ? addNeighborhood('${city.u}', ${city.id})
+          : removeNeighborhood(${city.id})
+        "
+      >
+        <div class="toggle-handle"></div>
       </div>
     </div>
   `;
 }
 
-function addNeighborhood(ISOA2, index) {
-  console.log("addNeighborhood", ISOA2, index);
+function addNeighborhood(ISOA2, cityId) {
+  console.log("addNeighborhood", ISOA2, cityId);
   const city = this.$store.d.all.find((x) => x.u == ISOA2);
-  const n = city.cities[index];
+  const n = city.cities.find((x) => x.id == cityId);
   this.$store.d.s.push(n);
-  this.$store.d.s.sort((a, b) => b.interesting - a.interesting);
+  this.$store.d.s.sort(
+    (a, b) => b.osm_interesting_interesting_sum_sum - a.osm_interesting_interesting_sum_sum
+  );
 
   // this.$store.s.cities = [...this.$store.s.cities, { id: city.id, displayname: city.displayname }];
 
@@ -93,7 +98,7 @@ function addNeighborhood(ISOA2, index) {
 function removeNeighborhood(n) {
   console.log("removed", n);
 
-  this.$store.d.s.splice(this.$store.d.s.indexOf((x) => x.n === n));
+  this.$store.d.s.splice(this.$store.d.s.indexOf((x) => x.id === n));
 }
 
 function debounce(fn, delay) {
@@ -167,7 +172,7 @@ function compareEveryColumn() {
     "public_transport",
     "public_transport_sum",
     "tourism",
-    "tourism_count",
+    "tourismcount",
     "flickr2_lowview_count_total_sum",
     "flickr2_medview_count_total_sum",
     "flickr2_highview_count_total_sum",

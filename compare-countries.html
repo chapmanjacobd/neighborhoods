@@ -137,7 +137,7 @@
       <div>
 
         <div class="content-padded">
-          <div style="display: flex; justify-content: space-between;">
+          <div :id="country.u" style="display: flex; justify-content: space-between;">
             <p x-text="resolve('n',  country)"></p>
           </div>
         </div>
@@ -156,9 +156,9 @@
 
             </template>
 
-            <template x-for="(city, index) in filterItems(filterString, country.cities)" :key="city.id">
+            <template x-for="city in filterItems(filterString, country.cities)" :key="city.id">
 
-              <li x-html="listNeighborhood(city, index)" class="table-view-cell">
+              <li x-html="listNeighborhood(city)" class="table-view-cell">
               </li>
 
             </template>
@@ -170,7 +170,7 @@
 
     <div style="display: flex;justify-content: center; padding-bottom:6rem">
       <button class="content-padded" @click="$store.s.page = 'compare';
-                    location.hash = '#tpc';
+                    location.hash = '#tpC';
                    ">Compare</button>
     </div>
 

@@ -385,7 +385,7 @@ function renameCountryValues(p, v) {
   if (v.length == 12) return monthChart(p, v);
 
   if (p == "dist") return Math.floor(v / 1000) + " km";
-  if (p == "dist") return Math.floor(v / 1000) + " km^2";
+  if (p == "dist_sum") return Math.floor(v / 1000) + " km^2";
   if (p == "noise") return v + " (dB)";
   if (p == "food") return singleValueChart(p, v);
   if (p == "accessibility_to_city") return singleValueChart(p, Math.floor((2 / v) * 100));
@@ -458,10 +458,10 @@ function renameCountryValues(p, v) {
 
     function getMaximum() {
       if (p == "co_var") return 80000;
-      if (p == "interesting") return 8000;
-      if (p == "boring") return 5000;
-      if (p == "safety") return 8000;
-      if (p == "danger") return 16000;
+      if (p == "interesting") return 10000;
+      if (p == "boring") return 10000;
+      if (p == "safety") return 10000;
+      if (p == "danger") return 20000;
       if (p == "coastline") return 100;
       if (p == "tourismcount") return 8000;
       if (p == "public_transport") return 250;

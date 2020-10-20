@@ -104,21 +104,22 @@ async function loadNeighborhoodsMany() {
 function listNeighborhood(neighborhood, index) {
   if (index == 0) console.log("listNeighborhood", neighborhood.cityId, neighborhood.n);
   return `
-    <div>
+    <div style="display: flex; justify-content: space-between;align-items: center;">
       <div>
         <i src="flags/blank.gif" class="flag flag-${neighborhood.u.toLowerCase()}"></i>
         ${neighborhood.n}
       </div>
-      <div>
-        <div :class="t ? d + ' active' : d" style="cursor: pointer;"
+      <div
+        :class="t ? d + ' active' : d"
+        style="cursor: pointer;"
         x-data="{ t: false, d: 'pull-right toggle' }"
         @click.debounce.200="
         t=!t;
           t ? addNeighborhood(${neighborhood.cityId}, ${index})
           : removeNeighborhood('${neighborhood.n}')
-        ">
-          <div class="toggle-handle"></div>
-        </div>
+        "
+      >
+        <div class="toggle-handle"></div>
       </div>
     </div>
   `;
