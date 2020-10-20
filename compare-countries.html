@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>UNLI Cities Compare</title>
+  <title>UNLI Countries Compare</title>
   <!-- Sets initial viewport load and disables zooming  -->
   <meta name="viewport" content="initial-scale=1, maximum-scale=1">
   <meta name="description" content="Compare cities at the scale of neighborhoods">
@@ -26,7 +26,7 @@
 
   <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
   <script src="./js/common.js"></script>
-  <script src="./js/compare.js"></script>
+  <script src="./js/compare-countries.js"></script>
 
 </head>
 
@@ -38,7 +38,7 @@
   </header>
 
   <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
-        //fetch('/n.json').then(r => r.json()).then(r => $store.d.all = [{id: 0, n: 'search cities', neighborhoods: r}])
+  fetch('./countries.json').then(r => r.json()).then(r => $store.d.all = [{id: 0, n: 'Select a country to load cities', countries: r}])
         $store.s.cities && $store.s.cities.length > 0 && $store.d.all.length == 0 ? loadNeighborhoodsMany() : ()=>{}
         " x-subscribe id='selectCitiesAndNeighborhoods'>
 
@@ -68,7 +68,7 @@
           <ul class="table-view" style="overflow-y: auto;">
 
             <div class="content-padded" x-show="$store.d.s.length == 0">
-              <h2 style="display: flex;justify-content: center;">🎑 choose a neighborhood first 👻</h2>
+              <h2 style="display: flex;justify-content: center;">🎑 choose a city first 👻</h2>
             </div>
 
             <div x-show="$store.d.s.length > 0">
@@ -125,8 +125,7 @@
 
     <!-- Initial Page -->
     <div class="content-padded" style="display: flex;">
-      <input type="search"
-        :placeholder="$store.d.all.length == 0 ? 'Search Cities' : 'Filter Neighborhoods / Search Cities'"
+      <input type="search" :placeholder="$store.d.all.length == 0 ? 'Search Cities' : 'Filter Countries / Cities'"
         style="margin-bottom: 5px;" x-model.debounce.150="filterString"
         x-on:keydown.enter="searchCity(filterString, $store.d.all); ">
       <a class="icon icon-search pull-right" href="#" @click="
@@ -156,7 +155,7 @@
         <div class="card" style="margin-bottom: 5rem;">
           <ul class="table-view" style="max-height: 14rem; overflow-y: auto;">
 
-            <template x-for="(cityStub, index, collection) in filterItems(filterString, city.searchResults)"
+            <template x-for="(cityStub, index, collection) in filterItems(filterString, city.countries)"
               :key="cityStub.id">
 
               <li x-html="listCity(cityStub)" @click.debounce.500="
@@ -168,10 +167,9 @@
 
             </template>
 
-            <template x-for="(neighborhood, index) in filterItems(filterString, city.neighborhoods)"
-              :key="neighborhood.n">
+            <template x-for="(city, index) in filterItems(filterString, city.cities)" :key="city.id">
 
-              <li x-html="listNeighborhood(neighborhood, index)" class="table-view-cell">
+              <li x-html="listNeighborhood(city, index)" class="table-view-cell">
               </li>
 
             </template>
@@ -197,15 +195,15 @@
       <span class="icon la la-globe"></span>
       <span class="tab-label">Countries</span>
     </a>
-    <a class="tab-item" href="./compare-countries.html">
+    <a class="tab-item active" href="./compare-countries.html">
       <span class="icon la la-object-group"></span>
       <span class="tab-label">Compare Countries</span>
     </a>
-    <a class="tab-item" href="./cities.html">
+    <a class="tab-item " href="./cities.html">
       <span class="icon la la-city"></span>
       <span class="tab-label">Cities</span>
     </a>
-    <a class="tab-item active" href="./compare.html">
+    <a class="tab-item" href="./compare.html">
       <span class="icon la la-object-ungroup"></span>
       <span class="tab-label">Compare Cities</span>
     </a>
