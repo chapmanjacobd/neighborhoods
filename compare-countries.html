@@ -38,8 +38,7 @@
   </header>
 
   <div class="content" style="padding: 44px 0;" x-data="getData()" x-init="
-  fetch('./countries.json').then(r => r.json()).then(r => $store.d.all = [{id: 0, n: 'Select a country to load cities', countries: r}])
-        $store.s.cities && $store.s.cities.length > 0 && $store.d.all.length == 0 ? loadNeighborhoodsMany() : ()=>{}
+  fetch('./countries.json').then(r => r.json()).then(r => $store.d.all = [{u: 0, n: 'Select a country to load cities', countries: r}])
         " x-subscribe id='selectCitiesAndNeighborhoods'>
 
 
@@ -126,11 +125,7 @@
     <!-- Initial Page -->
     <div class="content-padded" style="display: flex;">
       <input type="search" :placeholder="$store.d.all.length == 0 ? 'Search Cities' : 'Filter Countries / Cities'"
-        style="margin-bottom: 5px;" x-model.debounce.150="filterString"
-        x-on:keydown.enter="searchCity(filterString, $store.d.all); ">
-      <a class="icon icon-search pull-right" href="#" @click="
-            searchCity(filterString, $store.d.all);
-            " style="line-height: 1.5; padding: 0 0.3rem 0 0.6rem;"></a>
+        style="margin-bottom: 5px;" x-model.debounce.150="filterString">
     </div>
 
     <div class="content-padded" x-show="$store.d.all.length == 0">
@@ -138,36 +133,30 @@
     </div>
 
 
-    <template x-for="city in $store.d.all;console.log($store.d.all.length)" :key="city.id">
+    <template x-for="country in $store.d.all;console.log($store.d.all.length)" :key="country.u">
       <div>
 
         <div class="content-padded">
           <div style="display: flex; justify-content: space-between;">
-            <p x-text="resolve('n',  city)"></p>
-
-            <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded " x-show="city.id !== 0"
-              @click="removeCity(city.id)">
-              Remove City
-            </button>
+            <p x-text="resolve('n',  country)"></p>
           </div>
         </div>
 
         <div class="card" style="margin-bottom: 5rem;">
           <ul class="table-view" style="max-height: 14rem; overflow-y: auto;">
 
-            <template x-for="(cityStub, index, collection) in filterItems(filterString, city.countries)"
-              :key="cityStub.id">
+            <template x-for="(cityStub, index) in filterItems(filterString, country.countries)" :key="cityStub.u">
 
               <li x-html="listCity(cityStub)" @click.debounce.500="
                 await loadNeighborhoods(cityStub);
                 filterString = '';
-                $el.__x.updateElements($el);
+                //$el.__x.updateElements($el);
                 " class="table-view-cell">
               </li>
 
             </template>
 
-            <template x-for="(city, index) in filterItems(filterString, city.cities)" :key="city.id">
+            <template x-for="(city, index) in filterItems(filterString, country.cities)" :key="city.id">
 
               <li x-html="listNeighborhood(city, index)" class="table-view-cell">
               </li>

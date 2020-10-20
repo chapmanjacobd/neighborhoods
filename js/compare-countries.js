@@ -1,29 +1,3 @@
-function searchCity(searchString, items) {
-  (async function () {
-    try {
-      await fetch(`https://unli.xyz/neighbourhoods/api/searchOrigin?input=${searchString}`)
-        .then((res) => res.json())
-        .then((res) => {
-          items.splice(items.indexOf((x) => x.id === 0));
-          items.unshift({
-            id: 0,
-            n: "Search cities",
-            searchResults: res.map((x) => ({
-              ...x,
-              n: x.displayname,
-              u: x.displayname.substring(x.displayname.length - 3).slice(0, -1),
-            })),
-          });
-
-          const el = document.querySelector("#selectCitiesAndNeighborhoods");
-          el.__x.updateElements(el);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  })();
-}
-
 function listCity(city) {
   console.log("listCity");
   return `
@@ -47,23 +21,21 @@ function filterItems(filterString, items = []) {
   if (!filterString) return items.slice(0, 20);
 
   return matchSorter(items, filterString, {
-    keys: ["n", "s", "u", "name"],
+    keys: ["n", "s", "u", "c"],
   }).slice(0, 20);
 }
 
-/**
- * @param {{ id: any; displayname: any; n: any; }} city
- */
 async function loadNeighborhoods(country) {
   document.getElementById("loading").classList.add("active");
-  if (!this.$store.d.all.find((x) => x.id === country.id)) {
+  if (!this.$store.d.all.find((x) => x.u === country.u)) {
     try {
-      await fetch(`https://unli.xyz/neighbourhoods/api/getCities?k=${country.id}`)
+      await fetch(`https://unli.xyz/neighbourhoods/api/getCities?k=${country.u}`)
         .then((res) => res.json())
         .then((res) => {
+          console.log(res);
           this.$store.d.all.push({
-            id: country.id,
-            n: country.displayname || country.n,
+            u: country.u,
+            n: country.c,
             cities: res,
           });
         });
@@ -74,33 +46,21 @@ async function loadNeighborhoods(country) {
   }
 }
 
-async function loadNeighborhoodsMany() {
-  document.getElementById("loading").classList.add("active");
-
-  for await (const city of this.$store.s.cities) {
-    console.log("loadNeighborhoodsMany", city);
-    await loadNeighborhoods(city);
-  }
-
-  document.getElementById("loading").classList.remove("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function listNeighborhood(neighborhood, index) {
-  if (index == 0) console.log("listNeighborhood", neighborhood.cityId, neighborhood.n);
+function listNeighborhood(city, index) {
+  if (index == 0) console.log("listNeighborhood", city.u, city.n);
   return `
     <div>
       <div>
-        <i src="flags/blank.gif" class="flag flag-${neighborhood.u.toLowerCase()}"></i>
-        ${neighborhood.n}
+        <i src="flags/blank.gif" class="flag flag-${city.u.toLowerCase()}"></i>
+        ${city.n}
       </div>
       <div>
         <div :class="t ? d + ' active' : d" style="cursor: pointer;"
         x-data="{ t: false, d: 'pull-right toggle' }"
         @click.debounce.200="
         t=!t;
-          t ? addNeighborhood(${neighborhood.cityId}, ${index})
-          : removeNeighborhood('${neighborhood.n}')
+          t ? addNeighborhood('${city.u}', ${index})
+          : removeNeighborhood('${city.n}')
         ">
           <div class="toggle-handle"></div>
         </div>
@@ -109,14 +69,10 @@ function listNeighborhood(neighborhood, index) {
   `;
 }
 
-/**
- * @param {number} cityId
- * @param {number} index
- */
-function addNeighborhood(cityId, index) {
-  console.log("addNeighborhood", cityId, index);
-  const city = this.$store.d.all.find((x) => x.id == cityId);
-  const n = city.neighborhoods[index];
+function addNeighborhood(ISOA2, index) {
+  console.log("addNeighborhood", ISOA2, index);
+  const city = this.$store.d.all.find((x) => x.u == ISOA2);
+  const n = city.cities[index];
   this.$store.d.s.push(n);
   this.$store.d.s.sort((a, b) => b.interesting - a.interesting);
 
@@ -151,22 +107,19 @@ function debounce(fn, delay) {
   };
 }
 
-/**
- * @param {string} neighborhood
- */
-function comparePrintName(neighborhood) {
+function comparePrintName(city) {
   return `
-  <i src="flags/blank.gif" class="flag flag-${resolve("u", neighborhood).toLowerCase()}"></i>
-  <h5 style="padding-left:8px;">${
-    resolve("city", neighborhood) + " - " + resolve("n", neighborhood)
-  }</h5>
+  <i src="flags/blank.gif" class="flag flag-${resolve("u", city).toLowerCase()}"></i>
+  <h5 style="padding-left:8px;">${resolve("c", city) + " - " + resolve("n", city)}</h5>
    `;
 }
 
 function compareEveryColumn() {
   const hiddenKeys = [
+    "id",
     "n",
     "u",
+    "c",
     "s",
     "lat",
     "lon",
@@ -190,6 +143,19 @@ function compareEveryColumn() {
     "glob_ve",
     "glob_wet",
     "glob_urban",
+    "ghs_gpw_pop_2015__sum_sum",
+    "ghs_built_lds__mean_sum",
+    "access_50k_mean_sum",
+    "navwater2009__mean_sum",
+    "dryadv3croplands1992_mean_sum",
+    "glwd_2_count_sum",
+    "glwd_2_area_sum",
+    "glwd_2_perim_sum",
+    "globcover_nodata_sum",
+    "glwd3_50_100_wetland_sum",
+    "glwd3_25_50_wetland_sum",
+    "glwd3_0_25_wetland_sum",
+    "hcid",
   ];
   const priority = [
     "interesting",
@@ -197,8 +163,22 @@ function compareEveryColumn() {
     "danger",
     "safety",
     "food",
+    "food_sum",
     "public_transport",
+    "public_transport_sum",
     "tourism",
+    "tourism_count",
+    "flickr2_lowview_count_total_sum",
+    "flickr2_medview_count_total_sum",
+    "flickr2_highview_count_total_sum",
+    "toilets_sum",
+    "coastline_100m_count_sum",
+    "osm_interesting_interesting_sum_sum",
+    "osm_boring_boring_sum",
+    "osm_safe_safety_sum",
+    "danger_sum",
+    "slope100m__mean_sum",
+    "gm_ve_v2__mean_sum",
   ].reverse();
 
   const keys = Object.keys(this.$store.d.s[0] || {})

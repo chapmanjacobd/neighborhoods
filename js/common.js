@@ -270,8 +270,9 @@ function renameCountryProperties(p) {
   if (p == "s") return "State";
   if (p == "noise") return "Noise";
   if (p == "pop_avg") return "Population";
-  if (p == "avg_dist") return "Avg city neighborhood to center distance (km)";
+  if (p == "avg_dist") return "Avg neighborhood to city center distance (km)";
   if (p == "dist") return "Distance to city center";
+  if (p == "dist_sum") return "City sprawl";
   if (p == "avg_noise") return "Avg Noise (dB)";
   if (p == "pop_max") return "Largest city Population";
   if (p == "rain") return "Rainfall";
@@ -287,7 +288,7 @@ function renameCountryProperties(p) {
   if (p == "tourismcount") return "Tourism";
   if (p == "public_transport") return "Public transport";
   if (p == "slope_mean") return "Avg slope";
-  if (p == "popghs") return "Estimated population within the neighborhood (GHS)";
+  if (p == "popghs") return "Avg estimated population within each neighborhood (GHS)";
   if (p == "osmpop") return "Population of the city (OSM)";
   if (p == "built") return "Avg Built-up";
   if (p == "groads_count") return "# of Large roads";
@@ -335,22 +336,22 @@ function renameCountryProperties(p) {
   if (p == "osm_boring_boring_sum") return "Total boring features";
   if (p == "osm_safe_safety_sum") return "Total safety features";
   if (p == "danger_sum") return "Total risky features";
-  if (p == "coastline_100m_count_sum") return "coastline 100m Total";
+  if (p == "coastline_100m_count_sum") return "Total coastline";
   if (p == "flickr2_lowview_count_total_sum") return "Solo tourists";
   if (p == "flickr2_medview_count_total_sum") return "Family tourists";
   if (p == "flickr2_highview_count_total_sum") return "Celebrity tourists";
   if (p == "public_transport_sum") return "Total public transport";
-  if (p == "slope100m__mean_sum") return "Total slope100m  ";
+  if (p == "slope100m__mean_sum") return "Total slope";
   if (p == "ghs_gpw_pop_2015__sum_sum") return "ghs gpw pop 2015  sum sum";
   if (p == "ghs_built_lds__mean_sum") return "Total ghs built lds  ";
-  if (p == "toilets_sum") return "toilets sum";
-  if (p == "food_sum") return "food sum";
+  if (p == "toilets_sum") return "Total public toilets";
+  if (p == "food_sum") return "Total restaurants";
   if (p == "access_50k_mean_sum") return "access Total 50k ";
   if (p == "navwater2009__mean_sum") return "Total navwater2009  ";
-  if (p == "globcover_urban_sum") return "globcover urban sum";
-  if (p == "globcover_irrigated_cropland_sum") return "globcover irrigated cropland sum";
-  if (p == "globcover_rainfed_cropland_sum") return "globcover rainfed cropland sum";
-  if (p == "globcover_mosiac_cropland_sum") return "globcover mosiac cropland sum";
+  if (p == "globcover_urban_sum") return "Total urban land use";
+  if (p == "globcover_irrigated_cropland_sum") return "Total irrigated cropland use";
+  if (p == "globcover_rainfed_cropland_sum") return "Total rainfed cropland use";
+  if (p == "globcover_mosiac_cropland_sum") return "Total misc cropland";
   if (p == "dryadv3croplands1992_mean_sum") return "Total dryadv3croplands1992 ";
   if (p == "globcover_semideciduous_sum") return "globcover semideciduous sum";
   if (p == "globcover_closed_needleleaved_sum") return "globcover closed needleleaved sum";
@@ -358,18 +359,18 @@ function renameCountryProperties(p) {
   if (p == "globcover_herbaceous_vegetation_sum") return "globcover herbaceous vegetation sum";
   if (p == "globcover_mosiac_vegetation_sum") return "globcover mosiac vegetation sum";
   if (p == "globcover_bare_sum") return "globcover bare sum";
-  if (p == "gm_ve_v2__mean_sum") return "gm ve Total v2  ";
+  if (p == "gm_ve_v2__mean_sum") return "Total vegetation";
   if (p == "globcover_regularly_flooded_forest_sum")
     return "globcover regularly flooded forest sum";
   if (p == "globcover_permanently_flooded_forest_sum")
     return "globcover permanently flooded forest sum";
   if (p == "globcover_marsh_sum") return "globcover marsh sum";
   if (p == "globcover_water_sum") return "globcover water sum";
-  if (p == "hotels_com_price_avg") return "hotels com price avg";
-  if (p == "hotels_com_price_min") return "hotels com price min";
-  if (p == "hotels_com_count") return "hotels com count";
-  if (p == "hcid") return "hcid";
-  if (p == "hc_count") return "hc count";
+  if (p == "hotels_com_price_avg") return "hotels.com price avg";
+  if (p == "hotels_com_price_min") return "hotels.com price min";
+  if (p == "hotels_com_count") return "hotels.com hotels count";
+  if (p == "hc_count") return "hotels count";
+  if (p == "hc_price_min") return "hotels price min";
   // console.log(`if (p == "${p}") return "${p.replace(/_/g,' ')}";`);
 
   return p;
@@ -378,11 +379,13 @@ function renameCountryProperties(p) {
 function renameCountryValues(p, v) {
   if (!v) return "";
   if (typeof v == "string") return v;
+  if (p == "slope") v = v.slice(0, 3);
 
   if (v.length == 3) return minMaxChart(p, v);
   if (v.length == 12) return monthChart(p, v);
 
   if (p == "dist") return Math.floor(v / 1000) + " km";
+  if (p == "dist") return Math.floor(v / 1000) + " km^2";
   if (p == "noise") return v + " (dB)";
   if (p == "food") return singleValueChart(p, v);
   if (p == "accessibility_to_city") return singleValueChart(p, Math.floor((2 / v) * 100));
@@ -416,7 +419,7 @@ function renameCountryValues(p, v) {
       if (p == "slope_mean") return 20545;
       if (p == "popghs") return 60410;
       if (p == "osmpop") return 3029485;
-      if (p == "built") return 1242571;
+      if (p == "built") return 1000000;
       if (p == "groads") return 5;
       if (p == "groads_count") return 30;
       if (p == "groads_avg_length") return 50;
@@ -466,7 +469,7 @@ function renameCountryValues(p, v) {
       if (p == "popghs") return 60410;
       if (p == "osmpop") return 3029485;
       if (p == "osmpopulation_avg") return 3029485;
-      if (p == "built") return 1242571;
+      if (p == "built") return 1000000;
       if (p == "groads_count") return 30;
       if (p == "groads_avg_length") return 120;
       if (p == "toilets") return 80;
