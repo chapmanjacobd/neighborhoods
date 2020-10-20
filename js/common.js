@@ -380,6 +380,7 @@ function renameCountryValues(p, v) {
   if (!v) return "";
   if (typeof v == "string") return v;
   if (p == "slope") v = v.slice(0, 3);
+  if (p == "built") return minMaxChart(p, Math.floor(v / 1000));
 
   if (v.length == 3) return minMaxChart(p, v);
   if (v.length == 12) return monthChart(p, v);
@@ -443,10 +444,16 @@ function renameCountryValues(p, v) {
   function minMaxChart(p, v) {
     const maximum = getMaximum();
     const midP = v.map((x) => Math.max(0, (x / maximum) * 100));
+    const neighborhoodVariation = Math.floor((v[2] || 1) / (v[1] || 1));
 
     return `
       <div style="display:flex; justify-content: space-between;">
-        <p>Min ${(v[1] || 0).toLocaleString()}</p>
+        <p>Avg ${(v[1] || 0).toLocaleString()}</p>
+       ${
+         neighborhoodVariation > 1
+           ? `<p>${neighborhoodVariation.toLocaleString()}x neighborhood variation</p>`
+           : ""
+       }
         <p>Max ${(v[2] || 0).toLocaleString()}</p>
       </div>
       <div style="display: -webkit-box;">
