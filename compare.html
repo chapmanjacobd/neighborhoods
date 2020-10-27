@@ -143,7 +143,7 @@
       <div>
 
         <div class="content-padded">
-          <div style="display: flex; justify-content: space-between;">
+          <div :id="'c' + city.id" style="display: flex; justify-content: space-between;">
             <p x-text="resolve('n',  city)"></p>
 
             <button class="px-4 py-3 mt-4 text-sm text-white bg-blue-700 rounded " x-show="city.id !== 0"

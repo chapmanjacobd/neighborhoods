@@ -86,6 +86,7 @@ async function loadNeighborhoods(city) {
       console.log(err);
     }
     document.getElementById("loading").classList.remove("active");
+    setTimeout(() => (location.href = `#c${city.id}`), 50);
   }
 }
 
@@ -115,7 +116,7 @@ function listNeighborhood(neighborhood, index) {
         x-data="{ t: false, d: 'pull-right toggle' }"
         @click.debounce.200="
         t=!t;
-          t ? addNeighborhood(${neighborhood.cityId}, ${index})
+          t ? addNeighborhood(${neighborhood.cityId}, ${neighborhood.n})
           : removeNeighborhood('${neighborhood.n}')
         "
       >
@@ -125,14 +126,11 @@ function listNeighborhood(neighborhood, index) {
   `;
 }
 
-/**
- * @param {number} cityId
- * @param {number} index
- */
-function addNeighborhood(cityId, index) {
-  console.log("addNeighborhood", cityId, index);
+function addNeighborhood(cityId, neighborhoodName) {
+  console.log("addNeighborhood", cityId, neighborhoodName);
   const city = this.$store.d.all.find((x) => x.id == cityId);
-  const n = city.neighborhoods[index];
+  const n = city.neighborhoods.find((x) => x.n == neighborhoodName);
+
   this.$store.d.s.push(n);
   this.$store.d.s.sort((a, b) => b.interesting - a.interesting);
 }
