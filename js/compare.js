@@ -116,7 +116,10 @@ function listNeighborhood(neighborhood, index) {
         x-data="{ t: false, d: 'pull-right toggle' }"
         @click.debounce.200="
         t=!t;
-          t ? addNeighborhood(${neighborhood.cityId}, ${neighborhood.n})
+          t ? addNeighborhood(${neighborhood.cityId}, '${neighborhood.n.replace(
+    /(['"])/g,
+    "\\$1"
+  )}')
           : removeNeighborhood('${neighborhood.n}')
         "
       >
@@ -129,7 +132,7 @@ function listNeighborhood(neighborhood, index) {
 function addNeighborhood(cityId, neighborhoodName) {
   console.log("addNeighborhood", cityId, neighborhoodName);
   const city = this.$store.d.all.find((x) => x.id == cityId);
-  const n = city.neighborhoods.find((x) => x.n == neighborhoodName);
+  const n = city.neighborhoods.find((x) => x.n.replace(/(['"])/g, "\\$1") == neighborhoodName);
 
   this.$store.d.s.push(n);
   this.$store.d.s.sort((a, b) => b.interesting - a.interesting);
